@@ -4,9 +4,9 @@ goup keeps one go, on the channel it was installed with, the way rustup keeps
 rust's default toolchain: go itself picks a project's toolchain (GOTOOLCHAIN),
 so goup is only the go you run everywhere else. Underneath it is a stripped
 down ghpm for the one package go: the pinning, the manifest, the disk layout,
-the output and the conventions are ghpm's on purpose, and most of the code behind them is shared with it (see **golie**),
-so read ghpm's AGENTS.md for the reasoning behind anything here that looks
-unexplained. The verbs are rustup's and dotnetup's, with ghpm's as aliases.
+the output and the conventions are ghpm's on purpose, and most of the code
+behind them is shared with it (see **golie**), so read ghpm's AGENTS.md for
+the reasoning behind anything here that looks unexplained. The verbs are rustup's and dotnetup's, with ghpm's as aliases.
 
 ## After every code change
 
