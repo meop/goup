@@ -43,7 +43,6 @@ user-visible behavior changes.
 
 ```sh
 GOOS=darwin  GOARCH=arm64 go build -o goup-darwin-arm64      ./cmd/goup
-GOOS=darwin  GOARCH=amd64 go build -o goup-darwin-amd64      ./cmd/goup
 GOOS=linux   GOARCH=arm64 go build -o goup-linux-arm64       ./cmd/goup
 GOOS=linux   GOARCH=amd64 go build -o goup-linux-amd64       ./cmd/goup
 GOOS=windows GOARCH=arm64 go build -o goup-windows-arm64.exe ./cmd/goup
@@ -54,7 +53,7 @@ GOOS=windows GOARCH=amd64 go build -o goup-windows-amd64.exe ./cmd/goup
 
 To cut a release: bump the version in `VERSION` and push to `main`. The CI
 pipeline (`.github/workflows/pipeline.yaml`) is ghpm's: version check → validate
-(fmt + lint + test), with the tests again on Windows and macOS → a GPG-signed tag
+(fmt + lint) and the tests on every platform and architecture it ships for, each on its own runner → a GPG-signed tag
 `v<VERSION>` and `goreleaser release`.
 It requires the `GPG_PRIVATE_KEY` and `GPG_PASSPHRASE` repository secrets.
 Never create the tag by hand.
@@ -240,7 +239,7 @@ not part of `upgrade`.
 
 ## Testing on a real host
 
-CI runs the tests on Linux, macOS and Windows. To run them on a machine of your own over ssh:
+CI runs the tests on Linux and Windows on x86_64 and arm64, and macOS on arm64. To run them on a machine of your own over ssh:
 
 - Windows: build the test binary anywhere (`GOOS=windows go test -c -o <pkg>.test.exe ./<pkg>/`), copy it over and run
   it there. In PowerShell, quote a test flag whole (`'-test.v=true'`): PowerShell splits a bare `-test.v` at its dot.
