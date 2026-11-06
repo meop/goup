@@ -84,8 +84,9 @@ a separate module, and that is most of it: `manifest` (the manifest's format,
 keys, pin levels and shim names), `layout` (the directories under `~/.goup`),
 `journal` (commit and rollback), `tidy` (what is broken or orphaned, and its
 removal), `ui` (output and prompts), `vers` (pins and comparison), `fetch`
-(the checked download and extraction), `pinned` and `wedge` (the vendored
-mallet, kept at its pin by content), `shim`, `upgrade`, `lock` and `home`.
+(the checked download and extraction), `vendored`, `wedge` and `sig` (the
+vendored mallet, at wedge's latest release, checked against its signature),
+`shim`, `upgrade`, `lock` and `home`.
 golie knows nothing of go: where ghpm passes a package name, goup passes
 `go`. A change to any of those is made there, released there (bump its
 `VERSION`), and taken here with `go get github.com/meop/golie@v<VERSION>`.
@@ -119,8 +120,9 @@ adding a flag or a message, find ghpm's and use its shape and its words, with
 - **Nothing is chosen during an install.** A go release has one archive per
   platform and a fixed `bin`, so there is no asset prompt, no bin prompt, no
   second gate, and nothing recorded as declined
-- **No GitHub.** Releases and checksums are go.dev's, so there is no `gh`, no
-  `info`, `download`, `refresh` or `doctor`, and no `--skip-hash-check`
+- **No GitHub for go.** go's releases and checksums are go.dev's, so there is
+  no `gh`, no `info`, `download` or `doctor`, and no `--skip-hash-check`.
+  `refresh` is ghpm's verb, for the one thing goup takes from GitHub: wedge
 
 ## Manifest and disk layout
 
@@ -180,7 +182,8 @@ it says so. A `fixed` install is said and skipped; the rest: resolve → a newer
 release, or any with `--reinstall` → **gate table**
 (name/version/update/pin/uri) + confirm → `apply`.
 
-**apply** (one toolchain) — sync the vendored wedge once per command → fetch
+**apply** (one toolchain) — make sure there is a vendored wedge, once per
+command → fetch
 the archive into the download cache unless a copy with the right sha256 is
 there → unpack it beside its extract dir and rename it in → stamp a shim for
 every command in the tree's `bin` → write the manifest entry → remove shims
@@ -215,7 +218,8 @@ cache.
 
 **Upgrade** — goup and nothing else. The newest release is read from where
 `releases/latest` redirects, the archive is checked against that release's
-`SHA256SUMS`, and the running binary is replaced (moved aside first on
+`SHA256SUMS`, and that against its signature by the meop release key, and the
+running binary is replaced (moved aside first on
 Windows, which will not overwrite a running executable). Only the goup in
 `~/.goup/bin`, where the install script puts it, is replaced, reached directly
 or through a symlink. One that runs from anywhere else — ghpm's, `go
@@ -226,16 +230,17 @@ anything. Everything else such a goup does is unchanged: its
 state is still `~/.goup` and its shims still go in `~/.goup/bin`, it is only
 not in there itself.
 
-**Vendored wedge** — golie pins it: a version and the sha256 of each
-platform's archive and of every file kept from it. Before anything is stamped,
-the vendored files are checked against that pin by content, not by the version
-`mallet` reports, so a copy from another goup, a damaged one and a swapped one
-all fail the same check and are replaced from a plain download of the pinned
-release. The sync is **silent** — on a match, a fetch and a replace alike —
-since wedge is internals, and a line about it would only confuse someone who
-asked for a toolchain. Only a failure is shown. Never wire `pinned.Options.Fetching` or
-`Replacing` to a print. Taking a newer golie is the only way it moves; it is
-not part of `upgrade`.
+**Vendored wedge** — wedge's latest release, kept by golie's `vendored`, never
+pinned. Before anything is stamped, `apply` makes sure there is one, and uses
+whatever is there with no network: only where there is none (a new machine) is
+the latest fetched, said in the same `asset fetching` line as any download.
+**`refresh` is the one command that moves it**, for the user to run when they
+mean "get what's new"; it says that wedge is the latest, or what it installed
+or updated, and that shims keep the wedge they were stamped with until
+`update --reinstall` restamps them. A release is checked before any of it is
+used: its archive against its `SHA256SUMS`, and that against its signature by
+the meop release key golie carries. Never have `apply` look for a newer
+release, and never make wedge part of `upgrade`.
 
 ## Testing on a real host
 

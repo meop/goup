@@ -90,7 +90,7 @@ Use "{{.CommandPath}} [command] --help" for more information about a command.{{e
 	root.Flags().Bool("version", false, "Print goup version")
 
 	root.PersistentFlags().BoolVarP(&dryRun, "dry-run", "n", false, "Print execution only without running")
-	root.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Print the checks and syncs of goup's vendored tools")
+	root.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Print the checks and installs of goup's vendored wedge")
 	root.PersistentFlags().BoolVarP(&yes, "yes", "y", false, "Yes for confirmation prompts")
 	root.PersistentFlags().BoolVar(&nonInteractive, "non-interactive", false, "Never prompt; for scripted use")
 
@@ -102,6 +102,7 @@ Use "{{.CommandPath}} [command] --help" for more information about a command.{{e
 		newFindCmd(),
 		newInstallCmd(),
 		newListCmd(),
+		newRefreshCmd(),
 		newUninstallCmd(),
 		newUpdateCmd(),
 		newTidyCmd(),

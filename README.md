@@ -47,8 +47,14 @@ goup uninstall       # remove go
 goup tidy            # remove unused cached archives and orphaned items
 goup tidy --all      # remove all cached archives
 
+goup refresh         # move the wedge goup stamps its shims with to its latest
 goup upgrade         # upgrade goup itself
 ```
+
+goup stamps the `go` and `gofmt` shims with [wedge](https://github.com/meop/wedge), kept under `~/.goup/vendor/`.
+Only `goup refresh` looks for a newer wedge; every other command uses the one there, and fetches it only where there
+is none. A wedge release, and a goup release for `goup upgrade`, is checked against its checksums and their signature
+before it is used.
 
 There is one go at a time. Installing another channel replaces the one installed, once the
 new one is in place. The commands keep their names, `go` and `gofmt`, whatever the channel.
@@ -59,7 +65,7 @@ new one is in place. The commands keep their names, `go` and `gofmt`, whatever t
 |---|---|
 | `--dry-run`, `-n` | Print what would be done without executing |
 | `--yes`, `-y` | Skip confirmation prompts |
-| `--verbose`, `-v` | Also print the checks and syncs of goup's vendored tools, and more detail on their errors |
+| `--verbose`, `-v` | Also print the checks and installs of goup's vendored wedge, and more detail on their errors |
 | `--non-interactive` | Never prompt; for scripted use |
 
 ### Per-command flags

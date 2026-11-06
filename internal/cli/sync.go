@@ -14,10 +14,8 @@ import (
 	"github.com/meop/golie/journal"
 	"github.com/meop/golie/layout"
 	"github.com/meop/golie/manifest"
-	"github.com/meop/golie/pinned"
 	"github.com/meop/golie/tidy"
 	"github.com/meop/golie/vers"
-	"github.com/meop/golie/wedge"
 
 	"github.com/meop/goup/internal/config"
 	"github.com/meop/goup/internal/godl"
@@ -254,16 +252,6 @@ func applyAll(ctx context.Context, m *config.Manifest, changes []change) (done i
 		done++
 	}
 	return done, failed
-}
-
-// syncWedge makes sure the vendored mallet and its templates are the ones
-// this build pins, by content.
-func syncWedge(ctx context.Context, l layout.Layout) error {
-	dir, err := l.ShimDir()
-	if err != nil {
-		return err
-	}
-	return wedge.Sync(ctx, dir, pinned.Options{})
 }
 
 // apply brings one toolchain to its target release, the way ghpm installs a

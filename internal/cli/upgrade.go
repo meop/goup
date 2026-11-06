@@ -8,14 +8,17 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/meop/golie/sig"
 	"github.com/meop/golie/upgrade"
 
 	"github.com/meop/goup/internal/store"
 )
 
 // self is goup as its own release page publishes it. Everything upgrade asks
-// of GitHub is a plain page or release download; see golie's upgrade package.
-var self = upgrade.Self{Name: "goup", ReleasesURL: "https://github.com/meop/goup/releases/"}
+// of GitHub is a plain page or release download, and the release's SHA256SUMS
+// is checked against its signature by the meop release key; see golie's
+// upgrade package.
+var self = upgrade.Self{Name: "goup", ReleasesURL: "https://github.com/meop/goup/releases/", Key: sig.ReleaseKey}
 
 // installedSelf is self held to the one place goup upgrades itself from:
 // ~/.goup/bin, where its installer puts it. A goup that runs from anywhere
@@ -44,7 +47,7 @@ func newUpgradeCmd() *cobra.Command {
 }
 
 // runUpgrade upgrades goup and nothing else: go itself is update's,
-// and the vendored wedge is pinned to whatever the new goup was built to run.
+// and the vendored wedge is refresh's.
 func runUpgrade(cmd *cobra.Command, args []string) error {
 	ctx := context.Background()
 	failed := func(err error) error {
