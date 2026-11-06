@@ -48,7 +48,7 @@ func colorfn(role string) func(string) string {
 func NewRootCmd() *cobra.Command {
 	root := &cobra.Command{
 		Use:           "gotm [flags] [command]",
-		Short:         "Go Toolchain Manager — go toolchains, each kept at the release you pin",
+		Short:         "Go Toolchain Manager — one go, kept on the channel you pick",
 		SilenceUsage:  true,
 		SilenceErrors: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -97,12 +97,13 @@ Use "{{.CommandPath}} [command] --help" for more information about a command.{{e
 	root.SetHelpCommand(&cobra.Command{Hidden: true})
 
 	root.AddCommand(
-		newAddCmd(),
+		newCheckCmd(),
+		newDefaultCmd(),
 		newFindCmd(),
+		newInstallCmd(),
 		newListCmd(),
-		newOutdatedCmd(),
-		newRemoveCmd(),
-		newSyncCmd(),
+		newUninstallCmd(),
+		newUpdateCmd(),
 		newTidyCmd(),
 		newUpgradeCmd(),
 	)

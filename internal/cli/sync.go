@@ -24,7 +24,7 @@ import (
 	"github.com/meop/gotm/internal/store"
 )
 
-// reinstall and force are the two flags add and sync share, and they are
+// reinstall and force are the two flags install and update share, and they are
 // separate because they are different things to ask for: --reinstall redoes
 // gotm's own work and touches nothing that is not gotm's, while --force is the
 // only way a shim replaces a file gotm did not stamp. Neither implies the
@@ -46,36 +46,73 @@ type change struct {
 	target godl.Release
 }
 
-func newAddCmd() *cobra.Command {
+const installLong = "There is one go, run as go and gofmt, and it follows the channel it was installed with.\n" +
+	"Installing another channel replaces it.\n\n" +
+	"  gotm install          follow go's newest stable release\n" +
+	"  gotm install latest   the same, said aloud\n" +
+	"  gotm install 1.26     follow the newest 1.26.x\n" +
+	"  gotm install 1.26.4   stay on exactly 1.26.4\n\n" +
+	"A project's go.mod picks its own toolchain on top of this one: that is go's doing (GOTOOLCHAIN)."
+
+func newInstallCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "add [version...]",
-		Aliases: []string{"a", "ad", "in", "install"},
-		Short:   "Add go toolchains: latest, a line (1.26) or one release (1.26.4)",
-		Long: "Add go toolchains, each kept beside any already added.\n\n" +
-			"  gotm add          follow go's newest stable release, as go and gofmt\n" +
-			"  gotm add latest   the same, said aloud\n" +
-			"  gotm add 1.26     follow the newest 1.26.x, as go@1.26 and gofmt@1.26\n" +
-			"  gotm add 1.26.4   stay on exactly 1.26.4, as go@1.26.4 and gofmt@1.26.4",
-		RunE: runAdd,
+		Use:     "install [channel]",
+		Aliases: []string{"i", "in", "add", "a"},
+		Short:   "Install go, following latest, a line (1.26) or one release (1.26.4)",
+		Long:    installLong,
+		Args:    cobra.MaximumNArgs(1),
+		RunE:    runInstall,
 	}
 	addInstallFlags(cmd, "Reinstall even if already installed")
 	return cmd
 }
 
-func newSyncCmd() *cobra.Command {
+func newDefaultCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "sync [version...]",
-		Aliases: []string{"s", "sy", "up", "update"},
-		Short:   "Sync toolchains to the newest release each pin allows",
-		RunE:    runSync,
+		Use:   "default [channel]",
+		Short: "Show the channel go follows, or install another",
+		Long:  "With no channel, show the one go follows and the release it is on.\n\n" + installLong,
+		Args:  cobra.MaximumNArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if len(args) == 1 {
+				return runInstall(cmd, args)
+			}
+			m, err := config.LoadManifest()
+			if err != nil {
+				return fail("could not load manifest: %v", err)
+			}
+			if len(m.Extracts) == 0 {
+				print(msgNoneInstalled)
+				return nil
+			}
+			for _, key := range m.Keys() {
+				e := m.Extracts[key]
+				print("%s → %s (%s)", key, e.Version, e.Pin)
+			}
+			return nil
+		},
+	}
+	addInstallFlags(cmd, "Reinstall even if already installed")
+	return cmd
+}
+
+func newUpdateCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "update",
+		Aliases: []string{"u", "up", "sync", "s"},
+		Short:   "Update go to the newest release its channel allows",
+		Args:    cobra.NoArgs,
+		RunE:    runUpdate,
 	}
 	addInstallFlags(cmd, "Reinstall even if already at latest version")
 	return cmd
 }
 
-// runAdd is ghpm's add with the package left off: no argument is a bare
-// "go", the toolchain that follows go's newest release.
-func runAdd(cmd *cobra.Command, args []string) error {
+// runInstall puts go on the channel asked for, latest when none is. The
+// channel is the manifest key ghpm would use ("go", "go@1.26"), and only one
+// is kept: once the new one is in, any other is dropped, its shims among
+// them unless the new one stamped the same names.
+func runInstall(cmd *cobra.Command, args []string) error {
 	ctx := context.Background()
 	unlock, err := config.AcquireLock()
 	if err != nil {
@@ -86,60 +123,52 @@ func runAdd(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return fail("could not load manifest: %v", err)
 	}
-	if len(args) == 0 {
-		args = []string{config.PinLatest}
+	arg := config.PinLatest
+	if len(args) == 1 {
+		arg = args[0]
+	}
+	pin, err := parsePin(arg)
+	if err != nil {
+		return fail("%s: %v", arg, err)
+	}
+	key := keyOf(pin)
+	prev, exists := m.Extracts[key]
+	if exists && !reinstall {
+		print("%s: already installed → %s", key, prev.Version)
+		return nil
+	}
+	var r resolver
+	target, err := r.resolve(ctx, pin)
+	if err != nil {
+		return fail("%s: %v", key, err)
 	}
 
-	var r resolver
-	var changes []change
-	var failed []failedItem
-	for _, arg := range args {
-		pin, err := parsePin(arg)
-		if err != nil {
-			printFail("%s: %v", arg, err)
-			failed = append(failed, failedItem{name: arg, reason: err.Error()})
-			continue
-		}
-		key := keyOf(pin)
-		if slices.ContainsFunc(changes, func(c change) bool { return c.key == key }) {
-			continue
-		}
-		prev, exists := m.Extracts[key]
-		if exists && !reinstall {
-			print("%s: already added → %s", key, prev.Version)
-			continue
-		}
-		target, err := r.resolve(ctx, pin)
-		if err != nil {
-			printFail("%s: %v", key, err)
-			failed = append(failed, failedItem{name: key, reason: err.Error()})
-			continue
-		}
-		changes = append(changes, change{key: key, pin: pin, prev: prev, target: target})
+	others := slices.DeleteFunc(m.Keys(), func(k string) bool { return k == key })
+	replaces := make([]string, 0, len(others))
+	for _, k := range others {
+		replaces = append(replaces, fmt.Sprintf("%s %s", k, m.Extracts[k].Version))
 	}
-	if len(changes) == 0 {
+	rows := [][]string{{key, godl.Display(target.Version), manifest.Pin(pin), config.Source, strings.Join(replaces, ", ")}}
+	colors := []func(string) string{nil, colorfn("new"), nil, nil, colorfn("old")}
+	if !gate([]string{"name", "version", "pin", "uri", "replaces"}, rows, colors, "install "+key) {
+		return nil
+	}
+	done, failed := applyAll(ctx, m, []change{{key: key, pin: pin, prev: prev, target: target}})
+	if done == 0 {
 		return closing(failed)
 	}
-	var rows [][]string
-	for _, c := range changes {
-		rows = append(rows, []string{c.key, godl.Display(c.target.Version), manifest.Pin(c.pin), config.Source})
+	if len(others) > 0 {
+		failed = append(failed, dropAll(m, others, m.Extracts[key].Bin)...)
 	}
-	colors := []func(string) string{nil, colorfn("new"), nil, nil}
-	if gate([]string{"name", "version", "pin", "uri"}, rows, colors, fmt.Sprintf("add %d toolchain(s)", len(changes))) {
-		done, bad := applyAll(ctx, m, changes)
-		failed = append(failed, bad...)
-		if done > 0 {
-			printPass("installed %d toolchain(s)", done)
-			warnPath()
-		}
-	}
+	printPass("installed %s → %s", key, godl.Display(target.Version))
+	warnPath()
 	return closing(failed)
 }
 
-// runSync updates what was added and nothing else: with no toolchain added it
-// installs none, since which go to follow is a choice add is there to record.
-// A toolchain held to one release has nowhere to move, and is left alone.
-func runSync(cmd *cobra.Command, args []string) error {
+// runUpdate moves what was installed and nothing else: with nothing installed
+// it installs none, since which channel to follow is install's choice. A go
+// held to one release has nowhere to move, and is said to be.
+func runUpdate(cmd *cobra.Command, args []string) error {
 	ctx := context.Background()
 	unlock, err := config.AcquireLock()
 	if err != nil {
@@ -157,33 +186,12 @@ func runSync(cmd *cobra.Command, args []string) error {
 
 	var keys []string
 	var failed []failedItem
-	if len(args) == 0 {
-		for _, key := range m.Keys() {
-			if m.Extracts[key].Pin != manifest.PinFixed {
-				keys = append(keys, key)
-			}
-		}
-	}
-	for _, arg := range args {
-		pin, err := parsePin(arg)
-		if err != nil {
-			printFail("%s: %v", arg, err)
-			failed = append(failed, failedItem{name: arg, reason: err.Error()})
-			continue
-		}
-		key := keyOf(pin)
-		e, ok := m.Extracts[key]
-		if !ok {
-			print("%s: not installed", key)
-			continue
-		}
-		if e.Pin == manifest.PinFixed {
+	for _, key := range m.Keys() {
+		if e := m.Extracts[key]; e.Pin == manifest.PinFixed {
 			print("%s: fixed at %s, skipping", key, e.Version)
 			continue
 		}
-		if !slices.Contains(keys, key) {
-			keys = append(keys, key)
-		}
+		keys = append(keys, key)
 	}
 	if len(keys) == 0 {
 		return closing(failed)
@@ -320,7 +328,9 @@ func apply(ctx context.Context, m *config.Manifest, l layout.Layout, c change) e
 	}
 	bins := make(map[string]string, len(keys))
 	for _, binKey := range keys {
-		name := manifest.ShimName(c.key, filepath.Base(binKey))
+		// one go at a time, so its commands keep their own names whatever
+		// channel it follows
+		name := filepath.Base(binKey)
 		print("%s: bin found [%s]", c.key, binKey)
 		jrn.Did("shim "+name, journal.ShimUndo(s, name))
 		if err := s.Create(name, filepath.Join(vfile, filepath.FromSlash(binKey)), force); err != nil {

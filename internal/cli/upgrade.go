@@ -44,7 +44,7 @@ func newUpgradeCmd() *cobra.Command {
 	}
 }
 
-// runUpgrade upgrades gotm and nothing else: the go toolchains are sync's,
+// runUpgrade upgrades gotm and nothing else: go itself is update's,
 // and the vendored wedge is pinned to whatever the new gotm was built to run.
 func runUpgrade(cmd *cobra.Command, args []string) error {
 	ctx := context.Background()

@@ -164,92 +164,130 @@ func TestFindKeys(t *testing.T) {
 	}
 }
 
-// a bare add is a bare "go", the toolchain that follows go's newest release,
-// and a pin is recorded at ghpm's level for it
-func TestAddGate(t *testing.T) {
+// a bare install follows go's newest release, a pin is recorded at ghpm's
+// level for it, and installing another channel says which one it replaces
+func TestInstallGate(t *testing.T) {
 	t.Setenv("GOTM_TEST_HOME", t.TempDir())
 	goDev(t, nil, "go1.28rc1", "go1.27.2", "go1.27.1", "go1.26.9", "go1.25.3")
 	output := capture(t)
 	dryRun = true
 	defer func() { dryRun = false }()
-	add := newAddCmd()
+	install := newInstallCmd()
 	run := func(args ...string) string {
 		t.Helper()
-		_ = add.RunE(add, args)
+		_ = install.RunE(install, args)
 		return output()
 	}
 
-	latest := "name version pin    uri\n---- ------- ---    ---\ngo   1.27.2  latest go.dev/dl\n\n" + msgDryRun + "\n"
+	latest := "name version pin    uri       replaces\n---- ------- ---    ---       --------\ngo   1.27.2  latest go.dev/dl \n\n" + msgDryRun + "\n"
 	if got := run(); got != latest {
-		t.Errorf("add printed %q", got)
+		t.Errorf("install printed %q", got)
 	}
 	if got := run("latest"); got != latest {
-		t.Errorf("add latest printed %q", got)
+		t.Errorf("install latest printed %q", got)
 	}
-	want := "name       version pin   uri\n----       ------- ---   ---\ngo@1       1.27.2  major go.dev/dl\ngo@1.26    1.26.9  minor go.dev/dl\ngo@1.25.3  1.25.3  fixed go.dev/dl\ngo@1.28rc1 1.28rc1 fixed go.dev/dl\n\n" + msgDryRun + "\n"
-	if got := run("1", "go@1.26", "1.25.3", "1.28rc1"); got != want {
-		t.Errorf("add of each pin level printed %q", got)
+	for arg, row := range map[string]string{
+		"1":       "go@1 1.27.2  major",
+		"go@1.26": "go@1.26 1.26.9  minor",
+		"1.25.3":  "go@1.25.3 1.25.3  fixed",
+		"1.28rc1": "go@1.28rc1 1.28rc1 fixed",
+	} {
+		if got := run(arg); !strings.Contains(got, "\n"+row+" go.dev/dl") {
+			t.Errorf("install %s printed %q, want a row %q", arg, got, row)
+		}
+	}
+	if err := install.Args(install, []string{"1.26", "1.27"}); err == nil {
+		t.Error("install took two channels")
 	}
 
-	save(t, installed())
-	if got := run("latest", "1.26"); got != "go: already added → 1.27.1\ngo@1.26: already added → 1.26.9\n" {
-		t.Errorf("add of what is installed printed %q", got)
+	save(t, map[string]config.Entry{"go": {Pin: "latest", Version: "1.27.1", Bin: map[string]string{"go": "bin/go", "gofmt": "bin/gofmt"}}})
+	want := "name    version pin   uri       replaces\n----    ------- ---   ---       --------\ngo@1.26 1.26.9  minor go.dev/dl go 1.27.1\n\n" + msgDryRun + "\n"
+	if got := run("1.26"); got != want {
+		t.Errorf("install of another channel printed %q", got)
+	}
+	if got := run("latest"); got != "go: already installed → 1.27.1\n" {
+		t.Errorf("install of what is installed printed %q", got)
 	}
 	// --force is not --reinstall: it is about files in the way of a shim, and
 	// what is installed stays installed
 	force = true
-	if got := run("1.26"); got != "go@1.26: already added → 1.26.9\n" {
-		t.Errorf("add --force of what is installed printed %q", got)
+	if got := run(); got != "go: already installed → 1.27.1\n" {
+		t.Errorf("install --force of what is installed printed %q", got)
 	}
 	force = false
 	reinstall = true
 	defer func() { reinstall = false }()
-	if got := run("1.26"); got != "name    version pin   uri\n----    ------- ---   ---\ngo@1.26 1.26.9  minor go.dev/dl\n\n"+msgDryRun+"\n" {
-		t.Errorf("add --reinstall printed %q", got)
+	if got := run(); got != latest {
+		t.Errorf("install --reinstall printed %q", got)
 	}
 }
 
-// sync moves what can move: a toolchain held to one release is left out of a
-// bare sync and said when it is named
-func TestSyncGate(t *testing.T) {
+// default with a channel is install; without one it says what go follows
+func TestDefault(t *testing.T) {
+	t.Setenv("GOTM_TEST_HOME", t.TempDir())
+	output := capture(t)
+	def := newDefaultCmd()
+	if err := def.RunE(def, nil); err != nil || output() != msgNoneInstalled+"\n" {
+		t.Errorf("default with nothing installed: %v", err)
+	}
+	save(t, map[string]config.Entry{"go@1.26": {Pin: "minor", Version: "1.26.9"}})
+	if err := def.RunE(def, nil); err != nil {
+		t.Fatal(err)
+	}
+	if got := output(); got != "go@1.26 → 1.26.9 (minor)\n" {
+		t.Errorf("default printed %q", got)
+	}
+}
+
+// update moves what can move, and takes no channel: a go held to one release
+// is said to be
+func TestUpdateGate(t *testing.T) {
 	t.Setenv("GOTM_TEST_HOME", t.TempDir())
 	goDev(t, nil, "go1.27.2", "go1.27.1", "go1.26.9", "go1.25.14", "go1.25.3")
 	output := capture(t)
 	dryRun = true
 	defer func() { dryRun = false }()
-	sync := newSyncCmd()
-	run := func(args ...string) string {
+	update := newUpdateCmd()
+	run := func() string {
 		t.Helper()
-		_ = sync.RunE(sync, args)
+		_ = update.RunE(update, nil)
 		return output()
 	}
 
 	if got := run(); got != msgNoneInstalled+"\n" {
-		t.Errorf("sync with nothing installed printed %q", got)
+		t.Errorf("update with nothing installed printed %q", got)
 	}
-	save(t, installed())
+	if err := update.Args(update, []string{"1.26"}); err == nil {
+		t.Error("update took a channel")
+	}
+	save(t, map[string]config.Entry{"go": {Pin: "latest", Version: "1.27.1"}})
 	outdated := "name version update pin    uri\n---- ------- ------ ---    ---\ngo   1.27.1  1.27.2 latest go.dev/dl\n\n" + msgDryRun + "\n"
 	if got := run(); got != outdated {
-		t.Errorf("sync printed %q", got)
+		t.Errorf("update printed %q", got)
 	}
-	if got := run("1.25.3", "1.30", "1.26"); got != "go@1.25.3: fixed at 1.25.3, skipping\ngo@1.30: not installed\n"+msgAllUpToDate+"\n" {
-		t.Errorf("sync of a fixed, a missing and a current toolchain printed %q", got)
+	save(t, map[string]config.Entry{"go@1.25.3": {Pin: "fixed", Version: "1.25.3"}})
+	if got := run(); got != "go@1.25.3: fixed at 1.25.3, skipping\n" {
+		t.Errorf("update of a fixed go printed %q", got)
+	}
+	save(t, map[string]config.Entry{"go@1.26": {Pin: "minor", Version: "1.26.9"}})
+	if got := run(); got != msgAllUpToDate+"\n" {
+		t.Errorf("update of a current go printed %q", got)
 	}
 	// --reinstall moves what is current too, and --force alone does not
 	force = true
-	if got := run("1.26"); got != msgAllUpToDate+"\n" {
-		t.Errorf("sync --force of a current toolchain printed %q", got)
+	if got := run(); got != msgAllUpToDate+"\n" {
+		t.Errorf("update --force of a current go printed %q", got)
 	}
 	force = false
 	reinstall = true
 	defer func() { reinstall = false }()
 	current := "name    version update pin   uri\n----    ------- ------ ---   ---\ngo@1.26 1.26.9  1.26.9 minor go.dev/dl\n\n" + msgDryRun + "\n"
-	if got := run("1.26"); got != current {
-		t.Errorf("sync --reinstall of a current toolchain printed %q", got)
+	if got := run(); got != current {
+		t.Errorf("update --reinstall of a current go printed %q", got)
 	}
 }
 
-// find lists what add can install here: the newest release of each line, or
+// find lists what install can install here: the newest release of each line, or
 // every release a term starts, beside the toolchains already on them
 func TestFind(t *testing.T) {
 	t.Setenv("GOTM_TEST_HOME", t.TempDir())
@@ -265,7 +303,7 @@ func TestFind(t *testing.T) {
 	}
 
 	// a candidate is no line's newest release, and a release with no archive
-	// for this machine is not one add can install
+	// for this machine is not one install can put here
 	if got := run(); got != "version\n-------\n1.27.2\n1.26.9\n" {
 		t.Errorf("find printed %q", got)
 	}

@@ -99,7 +99,7 @@ func cached(path, sha string) bool {
 // installed toolchain is kept when some term starts what it is pinned to or
 // the release it is on (godl.StartsWith), so "1.27" lists go@1.27.2 and the
 // go that follows latest while it is on 1.27.x. With no terms it is every
-// key. Reading is wider than acting on purpose: sync and remove take a pin
+// key. Reading is wider than acting on purpose: install takes a pin
 // whole.
 func findKeys(m *config.Manifest, terms []string) []string {
 	keys := m.Keys()

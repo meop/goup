@@ -23,8 +23,8 @@ func newFindCmd() *cobra.Command {
 	return cmd
 }
 
-// runFind is where a version to add is looked up: go.dev's releases that have
-// an archive for this machine, which is what add can install here. With no
+// runFind is where a channel to install is looked up: go.dev's releases that have
+// an archive for this machine, which is what install can put here. With no
 // term it is the newest release of each line, the way uv lists pythons; a
 // term lists every release it starts (godl.Found), so a line's candidates and
 // betas are found by naming the line.
@@ -71,7 +71,7 @@ func runFind(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-// printReleases renders releases as versions add takes, beside the added
+// printReleases renders releases as versions install takes, beside the installed
 // toolchains that are on each. The name column is dropped when none is.
 func printReleases(m *config.Manifest, releases []godl.Release) {
 	versions := make([]string, len(releases))

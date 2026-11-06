@@ -104,3 +104,34 @@ func TestApplyPointsTheVersionFileAtEachReleaseAndLeavesNoOldOne(t *testing.T) {
 		t.Errorf("the install holds %v", names)
 	}
 }
+
+// installing another channel keeps only the new one: the old one's tree and
+// entry go once the new one is in
+func TestInstallAnotherChannelDropsTheOld(t *testing.T) {
+	t.Setenv("GOTM_TEST_HOME", t.TempDir())
+	l, err := store.Layout()
+	if err != nil {
+		t.Fatal(err)
+	}
+	m := save(t, map[string]config.Entry{})
+	for _, c := range []change{
+		{key: "go", pin: "", target: release(t, l, "1.27.2")},
+		{key: "go@1.26", pin: "1.26", target: release(t, l, "1.26.9")},
+	} {
+		if err := apply(context.Background(), m, l, c); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if failed := dropAll(m, []string{"go"}, m.Extracts["go@1.26"].Bin); len(failed) > 0 {
+		t.Fatalf("dropAll: %v", failed)
+	}
+	if keys := m.Keys(); len(keys) != 1 || keys[0] != "go@1.26" {
+		t.Errorf("the manifest holds %v", keys)
+	}
+	if _, err := os.Stat(l.ExtractPath("go")); !os.IsNotExist(err) {
+		t.Errorf("the old channel's tree is still there: %v", err)
+	}
+	if tree, ok := pointer.Target(l.VersionFilePath("go@1.26")); !ok || tree != l.VersionPath("go@1.26", "1.26.9") {
+		t.Errorf("the new channel's version file names %s, %v", tree, ok)
+	}
+}

@@ -49,11 +49,11 @@ func newListCmd() *cobra.Command {
 	return cmd
 }
 
-func newOutdatedCmd() *cobra.Command {
+func newCheckCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "outdated [version...]",
-		Aliases: []string{"o", "ou", "out", "stale"},
-		Short:   "List toolchains with newer releases available, optionally filtered by version",
+		Use:     "check [version...]",
+		Aliases: []string{"c", "outdated", "o", "out", "stale"},
+		Short:   "Say whether a newer release is out for go's channel",
 		Args:    cobra.ArbitraryArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			m, err := config.LoadManifest()
