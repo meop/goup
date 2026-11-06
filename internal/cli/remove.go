@@ -15,11 +15,10 @@ import (
 
 func newUninstallCmd() *cobra.Command {
 	return &cobra.Command{
-		Use:     "uninstall",
-		Aliases: []string{"un", "unin", "remove", "rm", "r"},
-		Short:   "Uninstall go",
-		Args:    cobra.NoArgs,
-		RunE:    runUninstall,
+		Use:   "uninstall",
+		Short: "Uninstall go",
+		Args:  cobra.NoArgs,
+		RunE:  runUninstall,
 	}
 }
 

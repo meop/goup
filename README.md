@@ -53,9 +53,6 @@ goup upgrade         # upgrade goup itself
 There is one go at a time. Installing another channel replaces the one installed, once the
 new one is in place. The commands keep their names, `go` and `gofmt`, whatever the channel.
 
-Each command takes [ghpm](https://github.com/meop/ghpm)'s verb as an alias too: `add` for
-`install`, `sync` for `update`, `remove` for `uninstall` and `outdated` for `check`.
-
 ### Global flags
 
 | Flag | Description |
@@ -77,14 +74,17 @@ Each command takes [ghpm](https://github.com/meop/ghpm)'s verb as an alias too: 
 
 ### Channels
 
-| Syntax | Name | Meaning | Updates |
-|---|---|---|---|
-| `goup install` | `go` | Latest version | Yes — `goup update` fetches the newest stable release |
-| `goup install 1` | `go@1` | Latest 1.x | Yes — within major only |
-| `goup install 1.26` | `go@1.26` | Latest 1.26.x | Yes — within major.minor only |
-| `goup install 1.26.4` | `go@1.26.4` | Exact version | Never — static pin |
+The one go follows one channel, the one it was installed with:
 
-The name is the key ghpm would give the same pin, and `list` and `default` print it.
+| Syntax | Channel | Follows | `goup update` |
+|---|---|---|---|
+| `goup install` | `go` | go's newest stable release | moves to each new release |
+| `goup install 1` | `go@1` | the newest 1.x | moves within 1.x |
+| `goup install 1.26` | `go@1.26` | the newest 1.26.x | moves within 1.26.x |
+| `goup install 1.26.4` | `go@1.26.4` | exactly 1.26.4 | never moves |
+
+Installing another channel replaces this one; goup never keeps two. `list` and `default`
+print the channel's name.
 
 ## Behavior
 
@@ -101,7 +101,7 @@ The name is the key ghpm would give the same pin, and `list` and `default` print
   symlinks or junctions.
 - A release candidate is installed only when you name it (`goup install 1.28rc1`).
 - `goup upgrade` replaces only the goup the install script put in
-  `~/.goup/bin`. One installed another way (ghpm, `go install`) works the
+  `~/.goup/bin`. One installed another way (a package manager, `go install`) works the
   same and keeps the same `~/.goup`, but is upgraded by what installed it.
 
 ## Verifying releases

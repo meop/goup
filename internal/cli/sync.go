@@ -56,12 +56,11 @@ const installLong = "There is one go, run as go and gofmt, and it follows the ch
 
 func newInstallCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "install [channel]",
-		Aliases: []string{"i", "in", "add", "a"},
-		Short:   "Install go, following latest, a line (1.26) or one release (1.26.4)",
-		Long:    installLong,
-		Args:    cobra.MaximumNArgs(1),
-		RunE:    runInstall,
+		Use:   "install [channel]",
+		Short: "Install go, following latest, a line (1.26) or one release (1.26.4)",
+		Long:  installLong,
+		Args:  cobra.MaximumNArgs(1),
+		RunE:  runInstall,
 	}
 	addInstallFlags(cmd, "Reinstall even if already installed")
 	return cmd
@@ -98,11 +97,10 @@ func newDefaultCmd() *cobra.Command {
 
 func newUpdateCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "update",
-		Aliases: []string{"u", "up", "sync", "s"},
-		Short:   "Update go to the newest release its channel allows",
-		Args:    cobra.NoArgs,
-		RunE:    runUpdate,
+		Use:   "update",
+		Short: "Update go to the newest release its channel allows",
+		Args:  cobra.NoArgs,
+		RunE:  runUpdate,
 	}
 	addInstallFlags(cmd, "Reinstall even if already at latest version")
 	return cmd

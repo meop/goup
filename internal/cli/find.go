@@ -14,10 +14,9 @@ import (
 
 func newFindCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "find [version...]",
-		Aliases: []string{"f", "fi", "se", "search"},
-		Short:   "List or search go's releases by version",
-		RunE:    runFind,
+		Use:   "find [version...]",
+		Short: "List or search go's releases by version",
+		RunE:  runFind,
 	}
 	addNameFormatFlags(cmd)
 	return cmd

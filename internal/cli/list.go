@@ -14,10 +14,9 @@ import (
 
 func newListCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "list [version...]",
-		Aliases: []string{"l", "li", "ls"},
-		Short:   "List installed toolchains, optionally filtered by version",
-		Args:    cobra.ArbitraryArgs,
+		Use:   "list",
+		Short: "List the installed go and its commands",
+		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			m, err := config.LoadManifest()
 			if err != nil {
@@ -27,11 +26,7 @@ func newListCmd() *cobra.Command {
 				print(msgNoneInstalled)
 				return nil
 			}
-			keys := findKeys(m, args)
-			if len(keys) == 0 {
-				print(msgNoMatch)
-				return nil
-			}
+			keys := m.Keys()
 			if printNameList(keys) {
 				return nil
 			}
@@ -51,10 +46,9 @@ func newListCmd() *cobra.Command {
 
 func newCheckCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "check [version...]",
-		Aliases: []string{"c", "outdated", "o", "out", "stale"},
-		Short:   "Say whether a newer release is out for go's channel",
-		Args:    cobra.ArbitraryArgs,
+		Use:   "check",
+		Short: "Say whether a newer release is out for go's channel",
+		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			m, err := config.LoadManifest()
 			if err != nil {
@@ -64,11 +58,7 @@ func newCheckCmd() *cobra.Command {
 				print(msgNoneInstalled)
 				return nil
 			}
-			matched := findKeys(m, args)
-			if len(matched) == 0 {
-				print(msgNoMatch)
-				return nil
-			}
+			matched := m.Keys()
 			var r resolver
 			var rows [][]string
 			var keys []string

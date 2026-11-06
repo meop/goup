@@ -17,10 +17,6 @@ var errSilent = errors.New("")
 
 const msgNoneInstalled = "no toolchains installed"
 
-// msgNoMatch is shown when a version filter was given but matched nothing
-// installed, to tell it from an empty install set ("no toolchains installed").
-const msgNoMatch = "no toolchains matched"
-
 const msgAllUpToDate = "all toolchains are up to date"
 
 const msgGoupUpToDate = "goup is up to date"

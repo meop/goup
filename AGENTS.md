@@ -6,7 +6,8 @@ so goup is only the go you run everywhere else. Underneath it is a stripped
 down ghpm for the one package go: the pinning, the manifest, the disk layout,
 the output and the conventions are ghpm's on purpose, and most of the code
 behind them is shared with it (see **golie**), so read ghpm's AGENTS.md for
-the reasoning behind anything here that looks unexplained. The verbs are rustup's and dotnetup's, with ghpm's as aliases.
+the reasoning behind anything here that looks unexplained. The verbs are
+rustup's and dotnetup's, with no aliases.
 
 ## After every code change
 
@@ -102,8 +103,8 @@ adding a flag or a message, find ghpm's and use its shape and its words, with
   use for several side by side. Installing a channel replaces whatever is
   installed, and the shims are always `go` and `gofmt`, never `go@1.26`
 - **rustup's verbs.** `install`, `update`, `uninstall`, `check` and
-  `default`, as rustup and dotnetup name them; ghpm's `add`, `sync`,
-  `remove` and `outdated` are their aliases. `update` and `uninstall` take
+  `default`, as rustup and dotnetup name them, and no aliases: not ghpm's
+  verbs, nor short forms of these. `update` and `uninstall` take
   no argument, since there is one go; `install` takes one channel at most
 - **No package argument.** The package is always `go`, so install takes only
   the pin: `goup install 1.26` is `ghpm add go@1.26`, and the key is
@@ -161,11 +162,10 @@ name/reason table whenever anything failed.
 
 **Arguments** — `install` (and `default` given one) takes a pin whole
 (`parsePin`): `latest`, a line, or one release, spelled bare (`1.26`) or as
-its key (`go@1.26`; `go` is `latest`). A command that **reads** (`find`,
-`list`, `check`) takes the start of a version (`godl.StartsWith`: `1.2`
-starts `1.2.1` and `1.2rc1`, never `1.26`) — `findKeys` puts it to an
-install's pin and to the release it is on, `godl.Found` to go.dev's releases.
-Do not add a third comparison.
+its key (`go@1.26`; `go` is `latest`). `find` takes the start of a version
+(`godl.StartsWith`: `1.2` starts `1.2.1` and `1.2rc1`, never `1.26`), which
+`godl.Found` puts to go.dev's releases. `list`, `check`, `update` and
+`uninstall` take nothing: there is one go.
 
 **Install** — one argument at most (none is `latest`): already installed on
 that channel says so unless `--reinstall` → resolve the pin against go.dev →
@@ -200,8 +200,7 @@ column shows the installs on a release, and is dropped when there are none.
 Names mode prints the versions.
 
 **List / Check** — ghpm's tables: a row per shim
-(name/version/pin/uri/type/target, with `update` for check), optionally
-filtered by terms. `uri` is always `go.dev/dl`; it is kept so the tables are
+(name/version/pin/uri/type/target, with `update` for check). `uri` is always `go.dev/dl`; it is kept so the tables are
 the ones ghpm prints. `check` leaves fixed installs out.
 
 **Uninstall** — gate → `dropAll`: a toolchain's shims, then its extract dir,
@@ -272,7 +271,7 @@ CI runs the tests on Linux, macOS and Windows. To run them on a machine of your 
   wording. `list` and `check` print keys and `find` prints versions, since
   those are what every other command takes
 - Output is ghpm's, word for word where the thing said is the same:
-  `no toolchains installed`, `no toolchains matched`, `all toolchains are up
+  `no toolchains installed`, `all toolchains are up
   to date`, `<name>: already installed → <version>`,
   `<name>: fixed at <version>, skipping`, `<name>: asset fetching [<asset>]...`,
   `<name>: bin found [<bin>]`, confirms (`install <name>`,

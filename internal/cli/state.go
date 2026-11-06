@@ -95,32 +95,6 @@ func cached(path, sha string) bool {
 	return strings.EqualFold(hex.EncodeToString(h.Sum(nil)), sha)
 }
 
-// findKeys is the reading commands' filter, for list and outdated: an
-// installed toolchain is kept when some term starts what it is pinned to or
-// the release it is on (godl.StartsWith), so "1.27" lists go@1.27.2 and the
-// go that follows latest while it is on 1.27.x. With no terms it is every
-// key. Reading is wider than acting on purpose: install takes a pin
-// whole.
-func findKeys(m *config.Manifest, terms []string) []string {
-	keys := m.Keys()
-	if len(terms) == 0 {
-		return keys
-	}
-	return slices.DeleteFunc(keys, func(key string) bool {
-		_, pin, _ := manifest.ParseKey(key)
-		return !slices.ContainsFunc(terms, func(term string) bool {
-			want, err := parsePin(term)
-			if err != nil {
-				return false
-			}
-			if want == "" {
-				return pin == ""
-			}
-			return godl.StartsWith(pin, want) || godl.StartsWith(m.Extracts[key].Version, want)
-		})
-	})
-}
-
 // entryRows is one row per shim of an install, behind the leading columns
 // prefix gives: ghpm's list rows, where the type is always bin.
 func entryRows(rows [][]string, prefix []string, e config.Entry) [][]string {

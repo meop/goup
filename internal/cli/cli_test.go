@@ -86,14 +86,6 @@ func save(t *testing.T, extracts map[string]config.Entry) *config.Manifest {
 	return m
 }
 
-func installed() map[string]config.Entry {
-	return map[string]config.Entry{
-		"go":        {Pin: "latest", Version: "1.27.1", Bin: map[string]string{"go": "bin/go", "gofmt": "bin/gofmt"}},
-		"go@1.26":   {Pin: "minor", Version: "1.26.9", Bin: map[string]string{"go@1.26": "bin/go"}},
-		"go@1.25.3": {Pin: "fixed", Version: "1.25.3", Bin: map[string]string{"go@1.25.3": "bin/go"}},
-	}
-}
-
 // names mode is for a script: it prints the keys, which every other command
 // takes, and with nothing installed it prints nothing at all rather than a
 // sentence the script would have to know
@@ -122,45 +114,19 @@ func TestListNamesMode(t *testing.T) {
 		}
 	}
 
-	save(t, installed())
-	if got := run(&longNames); got != "go\ngo@1.25.3\ngo@1.26\n" {
-		t.Errorf("--long-names printed %q", got)
-	}
-	if got := run(&shortNames, "1.26"); got != "go@1.26\n" {
-		t.Errorf("--short-names 1.26 printed %q", got)
-	}
-	if got := run(nil, "1.9"); got != msgNoMatch+"\n" {
-		t.Errorf("a filter that finds nothing printed %q", got)
-	}
-	// ghpm's list: a row per shim, under the key, the release and the pin level
-	want := "name    version pin   uri       type target\n----    ------- ---   ---       ---- ------\ngo@1.26 1.26.9  minor go.dev/dl bin  go@1.26\n"
-	if got := run(nil, "1.26"); got != want {
-		t.Errorf("list 1.26 printed %q", got)
-	}
-}
-
-// reading is wider than acting: a term keeps a toolchain by the start of
-// what it is pinned to or of the release it is on
-func TestFindKeys(t *testing.T) {
-	m := &config.Manifest{Extracts: installed()}
-	for _, tc := range []struct {
-		terms []string
-		want  []string
-	}{
-		{nil, []string{"go", "go@1.25.3", "go@1.26"}},
-		{[]string{"latest"}, []string{"go"}},
-		{[]string{"go"}, []string{"go"}},
-		{[]string{"1.27"}, []string{"go"}},
-		{[]string{"go@1.26"}, []string{"go@1.26"}},
-		{[]string{"1.26.9"}, []string{"go@1.26"}},
-		{[]string{"1.2"}, []string{}},
-		{[]string{"1"}, []string{"go", "go@1.25.3", "go@1.26"}},
-		{[]string{"1.25", "1.27"}, []string{"go", "go@1.25.3"}},
-		{[]string{"1.3", "nonsense"}, []string{}},
-	} {
-		if got := findKeys(m, tc.terms); !slices.Equal(got, tc.want) {
-			t.Errorf("findKeys(%v) = %v, want %v", tc.terms, got, tc.want)
+	save(t, map[string]config.Entry{
+		"go@1.26": {Pin: "minor", Version: "1.26.9", Bin: map[string]string{"go": "bin/go", "gofmt": "bin/gofmt"}},
+	})
+	for _, flag := range []*bool{&longNames, &shortNames} {
+		if got := run(flag); got != "go@1.26\n" {
+			t.Errorf("names mode printed %q", got)
 		}
+	}
+	// a row per shim, under the channel, the release and the pin level
+	want := "name    version pin   uri       type target\n----    ------- ---   ---       ---- ------\n" +
+		"go@1.26 1.26.9  minor go.dev/dl bin  go\ngo@1.26 1.26.9  minor go.dev/dl bin  gofmt\n"
+	if got := run(nil); got != want {
+		t.Errorf("list printed %q", got)
 	}
 }
 

@@ -20,11 +20,10 @@ const sourceDepth = 2
 
 func newTidyCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "tidy",
-		Aliases: []string{"t", "ti", "cl", "clean"},
-		Short:   "Clean unused downloads and orphaned items",
-		Args:    cobra.NoArgs,
-		RunE:    runTidy,
+		Use:   "tidy",
+		Short: "Clean unused downloads and orphaned items",
+		Args:  cobra.NoArgs,
+		RunE:  runTidy,
 	}
 	cmd.Flags().Bool("all", false, "Remove all cached assets regardless of installation status")
 	return cmd
