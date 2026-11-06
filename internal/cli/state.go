@@ -14,14 +14,14 @@ import (
 	"github.com/meop/golie/manifest"
 	"github.com/meop/golie/shim"
 
-	"github.com/meop/gotm/internal/config"
-	"github.com/meop/gotm/internal/godl"
-	"github.com/meop/gotm/internal/store"
+	"github.com/meop/goup/internal/config"
+	"github.com/meop/goup/internal/godl"
+	"github.com/meop/goup/internal/store"
 )
 
 // parsePin turns an argument into what a toolchain is pinned to: nothing for
 // the one that follows go's newest release, a line ("1.26") or one release
-// ("1.26.4"). gotm's one package is go, so the argument is ghpm's with the
+// ("1.26.4"). goup's one package is go, so the argument is ghpm's with the
 // name left off — "1.26" for ghpm's "go@1.26", "latest" for a bare "go" — and
 // the key itself is taken too, since it is what list prints.
 func parsePin(arg string) (string, error) {
@@ -39,8 +39,8 @@ func parsePin(arg string) (string, error) {
 // keyOf is the manifest key of the toolchain pinned to pin: "go", "go@1.26".
 func keyOf(pin string) string { return manifest.Key(pkgGo, pin) }
 
-// stamper is where gotm's shims go and what they may point at: a shim that
-// runs something under the extract dir is one gotm stamped.
+// stamper is where goup's shims go and what they may point at: a shim that
+// runs something under the extract dir is one goup stamped.
 func stamper() (shim.Stamper, error) {
 	l, err := store.Layout()
 	if err != nil {
@@ -54,7 +54,7 @@ func stamper() (shim.Stamper, error) {
 	if err != nil {
 		return shim.Stamper{}, err
 	}
-	return shim.Stamper{Tool: "gotm", BinDir: binDir, MalletDir: malletDir, Owned: l.ExtractsDir()}, nil
+	return shim.Stamper{Tool: "goup", BinDir: binDir, MalletDir: malletDir, Owned: l.ExtractsDir()}, nil
 }
 
 // isShim is tidy's question of a file in the bin dir.

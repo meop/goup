@@ -1,9 +1,9 @@
 #!/usr/bin/env sh
 set -e
 
-GOTM_REPO='meop/gotm'
-GOTM_BIN="$HOME/.gotm/bin"
-RELEASES="https://github.com/$GOTM_REPO/releases"
+GOUP_REPO='meop/goup'
+GOUP_BIN="$HOME/.goup/bin"
+RELEASES="https://github.com/$GOUP_REPO/releases"
 
 ARCH=$(uname -m)
 OS=$(uname -s | tr '[:upper:]' '[:lower:]')
@@ -34,7 +34,7 @@ sha256_of() {
 }
 
 # the newest release is where the release page's "latest" address redirects to
-echo "Fetching latest gotm release: github.com/$GOTM_REPO"
+echo "Fetching latest goup release: github.com/$GOUP_REPO"
 TAG=$(fetch --output /dev/null --write-out '%{url_effective}' --url "$RELEASES/latest")
 TAG=${TAG##*/}
 case "$TAG" in
@@ -43,7 +43,7 @@ case "$TAG" in
 esac
 echo "  version: $TAG"
 
-ASSET="gotm-${TAG#v}-${OS}-${ARCH_GO}.tar.gz"
+ASSET="goup-${TAG#v}-${OS}-${ARCH_GO}.tar.gz"
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
 
@@ -63,14 +63,14 @@ if [ -z "$WANT" ] || [ "$WANT" != "$GOT" ]; then
 fi
 
 tar -xzf "$TMP/$ASSET" -C "$TMP"
-if [ ! -f "$TMP/gotm" ]; then
-  echo "  gotm not found in $ASSET" >&2
+if [ ! -f "$TMP/goup" ]; then
+  echo "  goup not found in $ASSET" >&2
   exit 1
 fi
-mkdir -p "$GOTM_BIN"
-mv "$TMP/gotm" "$GOTM_BIN/gotm"
-chmod +x "$GOTM_BIN/gotm"
-echo "  installed $GOTM_BIN/gotm"
+mkdir -p "$GOUP_BIN"
+mv "$TMP/goup" "$GOUP_BIN/goup"
+chmod +x "$GOUP_BIN/goup"
+echo "  installed $GOUP_BIN/goup"
 
 echo ''
-echo 'Refer to the project README for how to activate gotm in your shell.'
+echo 'Refer to the project README for how to activate goup in your shell.'

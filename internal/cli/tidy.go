@@ -10,8 +10,8 @@ import (
 	"github.com/meop/golie/shim"
 	"github.com/meop/golie/tidy"
 
-	"github.com/meop/gotm/internal/config"
-	"github.com/meop/gotm/internal/store"
+	"github.com/meop/goup/internal/config"
+	"github.com/meop/goup/internal/store"
 )
 
 // sourceDepth is how many path elements go's source has under download/:
@@ -30,7 +30,7 @@ func newTidyCmd() *cobra.Command {
 	return cmd
 }
 
-// runTidy is ghpm's tidy over ~/.gotm: what is broken or orphaned is found
+// runTidy is ghpm's tidy over ~/.goup: what is broken or orphaned is found
 // and removed by golie's tidy, and each kind is shown and confirmed on its
 // own here.
 func runTidy(cmd *cobra.Command, args []string) error {
@@ -121,10 +121,10 @@ func cleanBrokenInstalls(m *config.Manifest, dirs tidy.Dirs) bool {
 	return true
 }
 
-// cleanOrphanedBinShims removes the shims gotm stamped that no toolchain
+// cleanOrphanedBinShims removes the shims goup stamped that no toolchain
 // owns any more. A file it did not stamp is not its to clean up.
 func cleanOrphanedBinShims(m *config.Manifest, dirs tidy.Dirs) bool {
-	paths := tidy.FindOrphanShims(m, dirs.Bin, []string{shim.ExeName("gotm")}, isShim)
+	paths := tidy.FindOrphanShims(m, dirs.Bin, []string{shim.ExeName("goup")}, isShim)
 	if len(paths) == 0 {
 		return false
 	}

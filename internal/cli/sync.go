@@ -19,21 +19,21 @@ import (
 	"github.com/meop/golie/vers"
 	"github.com/meop/golie/wedge"
 
-	"github.com/meop/gotm/internal/config"
-	"github.com/meop/gotm/internal/godl"
-	"github.com/meop/gotm/internal/store"
+	"github.com/meop/goup/internal/config"
+	"github.com/meop/goup/internal/godl"
+	"github.com/meop/goup/internal/store"
 )
 
 // reinstall and force are the two flags install and update share, and they are
 // separate because they are different things to ask for: --reinstall redoes
-// gotm's own work and touches nothing that is not gotm's, while --force is the
-// only way a shim replaces a file gotm did not stamp. Neither implies the
+// goup's own work and touches nothing that is not goup's, while --force is the
+// only way a shim replaces a file goup did not stamp. Neither implies the
 // other.
 var reinstall, force bool
 
 func addInstallFlags(cmd *cobra.Command, reinstallUsage string) {
 	cmd.Flags().BoolVarP(&reinstall, "reinstall", "r", false, reinstallUsage)
-	cmd.Flags().BoolVarP(&force, "force", "f", false, "Replace a file in the bin directory that is not a gotm shim")
+	cmd.Flags().BoolVarP(&force, "force", "f", false, "Replace a file in the bin directory that is not a goup shim")
 }
 
 // change is one toolchain a command is about to move: its manifest key, what
@@ -48,10 +48,10 @@ type change struct {
 
 const installLong = "There is one go, run as go and gofmt, and it follows the channel it was installed with.\n" +
 	"Installing another channel replaces it.\n\n" +
-	"  gotm install          follow go's newest stable release\n" +
-	"  gotm install latest   the same, said aloud\n" +
-	"  gotm install 1.26     follow the newest 1.26.x\n" +
-	"  gotm install 1.26.4   stay on exactly 1.26.4\n\n" +
+	"  goup install          follow go's newest stable release\n" +
+	"  goup install latest   the same, said aloud\n" +
+	"  goup install 1.26     follow the newest 1.26.x\n" +
+	"  goup install 1.26.4   stay on exactly 1.26.4\n\n" +
 	"A project's go.mod picks its own toolchain on top of this one: that is go's doing (GOTOOLCHAIN)."
 
 func newInstallCmd() *cobra.Command {

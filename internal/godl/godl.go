@@ -1,5 +1,5 @@
 // Package godl reads go's own release list from go.dev. It is the one source
-// gotm asks what releases exist, which is newest, and what each archive's
+// goup asks what releases exist, which is newest, and what each archive's
 // checksum is — no GitHub, no git, and no go installed yet.
 package godl
 
@@ -16,7 +16,7 @@ import (
 
 	"github.com/meop/golie/vers"
 
-	"github.com/meop/gotm/internal/config"
+	"github.com/meop/goup/internal/config"
 )
 
 // BaseURL is go's download site. A test points it at its own server.

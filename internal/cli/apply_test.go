@@ -14,9 +14,9 @@ import (
 
 	"github.com/meop/golie/layout"
 	"github.com/meop/golie/pointer"
-	"github.com/meop/gotm/internal/config"
-	"github.com/meop/gotm/internal/godl"
-	"github.com/meop/gotm/internal/store"
+	"github.com/meop/goup/internal/config"
+	"github.com/meop/goup/internal/godl"
+	"github.com/meop/goup/internal/store"
 )
 
 // release is a go release whose archive is already in the download cache: a go
@@ -69,7 +69,7 @@ func release(t *testing.T, l layout.Layout, version string) godl.Release {
 }
 
 func TestApplyPointsTheVersionFileAtEachReleaseAndLeavesNoOldOne(t *testing.T) {
-	t.Setenv("GOTM_TEST_HOME", t.TempDir())
+	t.Setenv("GOUP_TEST_HOME", t.TempDir())
 	l, err := store.Layout()
 	if err != nil {
 		t.Fatal(err)
@@ -108,7 +108,7 @@ func TestApplyPointsTheVersionFileAtEachReleaseAndLeavesNoOldOne(t *testing.T) {
 // installing another channel keeps only the new one: the old one's tree and
 // entry go once the new one is in
 func TestInstallAnotherChannelDropsTheOld(t *testing.T) {
-	t.Setenv("GOTM_TEST_HOME", t.TempDir())
+	t.Setenv("GOUP_TEST_HOME", t.TempDir())
 	l, err := store.Layout()
 	if err != nil {
 		t.Fatal(err)

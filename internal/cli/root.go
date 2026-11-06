@@ -1,4 +1,4 @@
-// Package cli holds gotm's subcommands.
+// Package cli holds goup's subcommands.
 package cli
 
 import (
@@ -7,11 +7,11 @@ import (
 
 	"github.com/meop/golie/ui"
 
-	"github.com/meop/gotm/internal/config"
+	"github.com/meop/goup/internal/config"
 )
 
-// pkgGo is the one package gotm manages: the name ghpm would be given, and
-// the one every gotm command leaves off.
+// pkgGo is the one package goup manages: the name ghpm would be given, and
+// the one every goup command leaves off.
 const pkgGo = config.Package
 
 var (
@@ -47,8 +47,8 @@ func colorfn(role string) func(string) string {
 
 func NewRootCmd() *cobra.Command {
 	root := &cobra.Command{
-		Use:           "gotm [flags] [command]",
-		Short:         "Go Toolchain Manager — one go, kept on the channel you pick",
+		Use:           "goup [flags] [command]",
+		Short:         "goup — one go, kept on the channel you pick",
 		SilenceUsage:  true,
 		SilenceErrors: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -87,10 +87,10 @@ Use "{{.CommandPath}} [command] --help" for more information about a command.{{e
 
 	root.Version = version
 	root.SetVersionTemplate("{{.Version}}\n")
-	root.Flags().Bool("version", false, "Print gotm version")
+	root.Flags().Bool("version", false, "Print goup version")
 
 	root.PersistentFlags().BoolVarP(&dryRun, "dry-run", "n", false, "Print execution only without running")
-	root.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Print the checks and syncs of gotm's vendored tools")
+	root.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Print the checks and syncs of goup's vendored tools")
 	root.PersistentFlags().BoolVarP(&yes, "yes", "y", false, "Yes for confirmation prompts")
 	root.PersistentFlags().BoolVar(&nonInteractive, "non-interactive", false, "Never prompt; for scripted use")
 

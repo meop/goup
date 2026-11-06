@@ -1,4 +1,4 @@
-module github.com/meop/gotm
+module github.com/meop/goup
 
 go 1.27.0
 

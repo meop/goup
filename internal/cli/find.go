@@ -8,8 +8,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/meop/gotm/internal/config"
-	"github.com/meop/gotm/internal/godl"
+	"github.com/meop/goup/internal/config"
+	"github.com/meop/goup/internal/godl"
 )
 
 func newFindCmd() *cobra.Command {

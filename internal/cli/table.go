@@ -23,11 +23,11 @@ const msgNoMatch = "no toolchains matched"
 
 const msgAllUpToDate = "all toolchains are up to date"
 
-const msgGotmUpToDate = "gotm is up to date"
+const msgGoupUpToDate = "goup is up to date"
 
-// msgCannotUpgradeItself is upgrade's whole answer to a gotm its installer
+// msgCannotUpgradeItself is upgrade's whole answer to a goup its installer
 // did not place: the path it runs from is what says who does upgrade it.
-const msgCannotUpgradeItself = "gotm: cannot upgrade itself, running from %s"
+const msgCannotUpgradeItself = "goup: cannot upgrade itself, running from %s"
 
 // msgDryRun is printed at every dry-run bail point: a bare preview table
 // followed by silence is indistinguishable from a hang.

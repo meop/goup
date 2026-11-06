@@ -9,7 +9,7 @@ import (
 func withHome(t *testing.T) string {
 	t.Helper()
 	home := t.TempDir()
-	t.Setenv("GOTM_TEST_HOME", home)
+	t.Setenv("GOUP_TEST_HOME", home)
 	return home
 }
 
@@ -21,7 +21,7 @@ func TestManifestStartsEmpty(t *testing.T) {
 	}
 }
 
-// the manifest is ghpm's, kept at ~/.gotm/manifest.json
+// the manifest is ghpm's, kept at ~/.goup/manifest.json
 func TestManifestRoundTrip(t *testing.T) {
 	home := withHome(t)
 	want := &Manifest{
@@ -38,7 +38,7 @@ func TestManifestRoundTrip(t *testing.T) {
 	if err != nil || len(got.Extracts) != 2 || got.Extracts["go@1.26"].Version != "1.26.9" || got.Repos["go"] != "go.dev/dl" {
 		t.Fatalf("loaded %+v, %v", got, err)
 	}
-	dir := filepath.Join(home, ".gotm")
+	dir := filepath.Join(home, ".goup")
 	if _, err := os.Stat(filepath.Join(dir, "manifest.json")); err != nil {
 		t.Errorf("the manifest is not at %s: %v", dir, err)
 	}
@@ -48,8 +48,8 @@ func TestManifestRoundTrip(t *testing.T) {
 }
 
 func TestStoreRefusesTheRealHomeUnderTest(t *testing.T) {
-	t.Setenv("GOTM_TEST_HOME", "")
+	t.Setenv("GOUP_TEST_HOME", "")
 	if _, err := LoadManifest(); err == nil {
-		t.Fatal("a test with no GOTM_TEST_HOME reached for the real home")
+		t.Fatal("a test with no GOUP_TEST_HOME reached for the real home")
 	}
 }

@@ -4,9 +4,9 @@ param()
 $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue'
 
-$GotmRepo = 'meop/gotm'
-$GotmBin = "$env:USERPROFILE\.gotm\bin"
-$Releases = "https://github.com/$GotmRepo/releases"
+$GoupRepo = 'meop/goup'
+$GoupBin = "$env:USERPROFILE\.goup\bin"
+$Releases = "https://github.com/$GoupRepo/releases"
 
 $IsArm64 = [System.Runtime.InteropServices.RuntimeInformation]::ProcessArchitecture -eq `
   [System.Runtime.InteropServices.Architecture]::Arm64
@@ -15,7 +15,7 @@ $GoArch = if ($IsArm64) { 'arm64' } else { 'amd64' }
 # every request is a plain page or release download: no GitHub API, so no rate
 # limit and no token. the newest release is where the release page's "latest"
 # address redirects to
-Write-Host "Fetching latest gotm release: github.com/$GotmRepo"
+Write-Host "Fetching latest goup release: github.com/$GoupRepo"
 $latest = Invoke-WebRequest -ErrorAction Stop -UseBasicParsing -Method Head -Uri "$Releases/latest"
 $resolved = if ($latest.BaseResponse.ResponseUri) { $latest.BaseResponse.ResponseUri } else { $latest.BaseResponse.RequestMessage.RequestUri }
 $Tag = ([string]$resolved).TrimEnd('/').Split('/')[-1]
@@ -25,7 +25,7 @@ if ($Tag -notmatch '^v\d') {
 }
 Write-Host "  version: $Tag"
 
-$Asset = "gotm-$($Tag.TrimStart('v'))-windows-$GoArch.zip"
+$Asset = "goup-$($Tag.TrimStart('v'))-windows-$GoArch.zip"
 $tmp = Join-Path ([System.IO.Path]::GetTempPath()) ([System.IO.Path]::GetRandomFileName())
 New-Item -ItemType Directory -Path $tmp | Out-Null
 try {
@@ -43,17 +43,17 @@ try {
   }
 
   Expand-Archive "$tmp\$Asset" -DestinationPath "$tmp\unpacked" -Force
-  $exe = Get-ChildItem "$tmp\unpacked" -Recurse -Filter 'gotm.exe' | Select-Object -First 1
+  $exe = Get-ChildItem "$tmp\unpacked" -Recurse -Filter 'goup.exe' | Select-Object -First 1
   if (-not $exe) {
-    Write-Error "gotm.exe not found in $Asset"
+    Write-Error "goup.exe not found in $Asset"
     exit 1
   }
-  New-Item -ItemType Directory -Path $GotmBin -Force | Out-Null
-  Copy-Item $exe.FullName "$GotmBin\gotm.exe" -Force
-  Write-Host "  installed $GotmBin\gotm.exe"
+  New-Item -ItemType Directory -Path $GoupBin -Force | Out-Null
+  Copy-Item $exe.FullName "$GoupBin\goup.exe" -Force
+  Write-Host "  installed $GoupBin\goup.exe"
 } finally {
   Remove-Item $tmp -Recurse -Force -ErrorAction SilentlyContinue
 }
 
 Write-Host ''
-Write-Host 'Refer to the project README for how to activate gotm in your shell.'
+Write-Host 'Refer to the project README for how to activate goup in your shell.'

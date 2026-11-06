@@ -1,13 +1,13 @@
-// Package config holds gotm's manifest and its lock over ~/.gotm.
+// Package config holds goup's manifest and its lock over ~/.goup.
 package config
 
 import (
 	"github.com/meop/golie/manifest"
 
-	"github.com/meop/gotm/internal/store"
+	"github.com/meop/goup/internal/store"
 )
 
-// The manifest is golie's, the one ghpm keeps: gotm is ghpm with a single
+// The manifest is golie's, the one ghpm keeps: goup is ghpm with a single
 // package, so its installs are recorded the same way — "go" for the toolchain
 // that follows go's newest release, "go@1.26" for one held to a line and
 // "go@1.26.4" for one held to a release.
@@ -16,7 +16,7 @@ type (
 	Manifest = manifest.Manifest
 )
 
-// Package is the one package gotm manages, and Source where its releases
+// Package is the one package goup manages, and Source where its releases
 // come from, as the manifest's repo map records them.
 const (
 	Package = "go"

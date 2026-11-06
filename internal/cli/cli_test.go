@@ -13,8 +13,8 @@ import (
 
 	"github.com/meop/golie/ui"
 
-	"github.com/meop/gotm/internal/config"
-	"github.com/meop/gotm/internal/godl"
+	"github.com/meop/goup/internal/config"
+	"github.com/meop/goup/internal/godl"
 )
 
 // a pin is ghpm's with the package left off, and the key list prints is
@@ -98,7 +98,7 @@ func installed() map[string]config.Entry {
 // takes, and with nothing installed it prints nothing at all rather than a
 // sentence the script would have to know
 func TestListNamesMode(t *testing.T) {
-	t.Setenv("GOTM_TEST_HOME", t.TempDir())
+	t.Setenv("GOUP_TEST_HOME", t.TempDir())
 	output := capture(t)
 	list := newListCmd()
 	run := func(flag *bool, args ...string) string {
@@ -167,7 +167,7 @@ func TestFindKeys(t *testing.T) {
 // a bare install follows go's newest release, a pin is recorded at ghpm's
 // level for it, and installing another channel says which one it replaces
 func TestInstallGate(t *testing.T) {
-	t.Setenv("GOTM_TEST_HOME", t.TempDir())
+	t.Setenv("GOUP_TEST_HOME", t.TempDir())
 	goDev(t, nil, "go1.28rc1", "go1.27.2", "go1.27.1", "go1.26.9", "go1.25.3")
 	output := capture(t)
 	dryRun = true
@@ -224,7 +224,7 @@ func TestInstallGate(t *testing.T) {
 
 // default with a channel is install; without one it says what go follows
 func TestDefault(t *testing.T) {
-	t.Setenv("GOTM_TEST_HOME", t.TempDir())
+	t.Setenv("GOUP_TEST_HOME", t.TempDir())
 	output := capture(t)
 	def := newDefaultCmd()
 	if err := def.RunE(def, nil); err != nil || output() != msgNoneInstalled+"\n" {
@@ -242,7 +242,7 @@ func TestDefault(t *testing.T) {
 // update moves what can move, and takes no channel: a go held to one release
 // is said to be
 func TestUpdateGate(t *testing.T) {
-	t.Setenv("GOTM_TEST_HOME", t.TempDir())
+	t.Setenv("GOUP_TEST_HOME", t.TempDir())
 	goDev(t, nil, "go1.27.2", "go1.27.1", "go1.26.9", "go1.25.14", "go1.25.3")
 	output := capture(t)
 	dryRun = true
@@ -290,7 +290,7 @@ func TestUpdateGate(t *testing.T) {
 // find lists what install can install here: the newest release of each line, or
 // every release a term starts, beside the toolchains already on them
 func TestFind(t *testing.T) {
-	t.Setenv("GOTM_TEST_HOME", t.TempDir())
+	t.Setenv("GOUP_TEST_HOME", t.TempDir())
 	goDev(t, []string{"go1.4.3"}, "go1.28rc1", "go1.27.2", "go1.27.1", "go1.26.9", "go1.4.3")
 	output := capture(t)
 	find := newFindCmd()
@@ -334,9 +334,9 @@ func TestFind(t *testing.T) {
 	}
 }
 
-// tidy is ghpm's over ~/.gotm: with everything accounted for it says so
+// tidy is ghpm's over ~/.goup: with everything accounted for it says so
 func TestTidyNothing(t *testing.T) {
-	t.Setenv("GOTM_TEST_HOME", t.TempDir())
+	t.Setenv("GOUP_TEST_HOME", t.TempDir())
 	output := capture(t)
 	tidy := newTidyCmd()
 	if err := tidy.RunE(tidy, nil); err != nil {

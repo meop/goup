@@ -8,8 +8,8 @@ import (
 	"github.com/meop/golie/manifest"
 	"github.com/meop/golie/vers"
 
-	"github.com/meop/gotm/internal/config"
-	"github.com/meop/gotm/internal/godl"
+	"github.com/meop/goup/internal/config"
+	"github.com/meop/goup/internal/godl"
 )
 
 func newListCmd() *cobra.Command {

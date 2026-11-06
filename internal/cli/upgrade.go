@@ -10,15 +10,15 @@ import (
 
 	"github.com/meop/golie/upgrade"
 
-	"github.com/meop/gotm/internal/store"
+	"github.com/meop/goup/internal/store"
 )
 
-// self is gotm as its own release page publishes it. Everything upgrade asks
+// self is goup as its own release page publishes it. Everything upgrade asks
 // of GitHub is a plain page or release download; see golie's upgrade package.
-var self = upgrade.Self{Name: "gotm", ReleasesURL: "https://github.com/meop/gotm/releases/"}
+var self = upgrade.Self{Name: "goup", ReleasesURL: "https://github.com/meop/goup/releases/"}
 
-// installedSelf is self held to the one place gotm upgrades itself from:
-// ~/.gotm/bin, where its installer puts it. A gotm that runs from anywhere
+// installedSelf is self held to the one place goup upgrades itself from:
+// ~/.goup/bin, where its installer puts it. A goup that runs from anywhere
 // else — ghpm's, go install's, a build — is upgraded by what put it there.
 func installedSelf() (upgrade.Self, error) {
 	l, err := store.Layout()
@@ -38,23 +38,23 @@ func newUpgradeCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:     "upgrade",
 		Aliases: []string{"ug", "upg"},
-		Short:   "Upgrade gotm to its latest release",
+		Short:   "Upgrade goup to its latest release",
 		Args:    cobra.NoArgs,
 		RunE:    runUpgrade,
 	}
 }
 
-// runUpgrade upgrades gotm and nothing else: go itself is update's,
-// and the vendored wedge is pinned to whatever the new gotm was built to run.
+// runUpgrade upgrades goup and nothing else: go itself is update's,
+// and the vendored wedge is pinned to whatever the new goup was built to run.
 func runUpgrade(cmd *cobra.Command, args []string) error {
 	ctx := context.Background()
 	failed := func(err error) error {
-		printFail("gotm: %v", err)
-		printFailedTable("component", []failedItem{{name: "gotm", reason: err.Error()}})
+		printFail("goup: %v", err)
+		printFailedTable("component", []failedItem{{name: "goup", reason: err.Error()}})
 		return errSilent
 	}
 
-	// asked first, and of nothing but the disk: a gotm that will not be
+	// asked first, and of nothing but the disk: a goup that will not be
 	// replaced has no use for which release is newest
 	self, err := installedSelf()
 	if err != nil {
@@ -73,20 +73,20 @@ func runUpgrade(cmd *cobra.Command, args []string) error {
 	}
 	latest := strings.TrimPrefix(tag, "v")
 	if latest == strings.TrimPrefix(version, "v") {
-		print(msgGotmUpToDate)
+		print(msgGoupUpToDate)
 		return nil
 	}
 	if !gate(
 		[]string{"name", "version", "update"},
-		[][]string{{"gotm", version, latest}},
+		[][]string{{"goup", version, latest}},
 		[]func(string) string{nil, colorfn("old"), colorfn("new")},
-		fmt.Sprintf("upgrade gotm to %s", latest),
+		fmt.Sprintf("upgrade goup to %s", latest),
 	) {
 		return nil
 	}
-	if err := self.Install(ctx, tag, func(asset string) { print("gotm: asset fetching [%s]...", asset) }); err != nil {
+	if err := self.Install(ctx, tag, func(asset string) { print("goup: asset fetching [%s]...", asset) }); err != nil {
 		return failed(err)
 	}
-	printPass("upgraded gotm to %s", latest)
+	printPass("upgraded goup to %s", latest)
 	return nil
 }

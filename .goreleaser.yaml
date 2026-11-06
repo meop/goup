@@ -5,9 +5,9 @@ before:
     - go mod tidy
 
 builds:
-  - id: gotm
-    main: ./cmd/gotm
-    binary: gotm
+  - id: goup
+    main: ./cmd/goup
+    binary: goup
     ldflags:
       - -X main.version={{.Version}}
     goos:
@@ -19,8 +19,8 @@ builds:
       - amd64
 
 archives:
-  - id: gotm
-    name_template: 'gotm-{{ .Version }}-{{ .Os }}-{{ .Arch }}'
+  - id: goup
+    name_template: 'goup-{{ .Version }}-{{ .Os }}-{{ .Arch }}'
     formats:
       - tar.gz
     format_overrides:

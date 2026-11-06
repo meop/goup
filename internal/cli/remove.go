@@ -9,8 +9,8 @@ import (
 
 	"github.com/meop/golie/tidy"
 
-	"github.com/meop/gotm/internal/config"
-	"github.com/meop/gotm/internal/store"
+	"github.com/meop/goup/internal/config"
+	"github.com/meop/goup/internal/store"
 )
 
 func newUninstallCmd() *cobra.Command {
