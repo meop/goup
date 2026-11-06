@@ -104,19 +104,6 @@ The name is the key ghpm would give the same pin, and `list` and `default` print
   `~/.goup/bin`. One installed another way (ghpm, `go install`) works the
   same and keeps the same `~/.goup`, but is upgraded by what installed it.
 
-## Coming from gotm
-
-goup is gotm, renamed when it stopped keeping toolchains side by side. It keeps its state in
-`~/.goup`, not `~/.gotm`, and reads nothing from the old place. To move over:
-
-```sh
-goup install            # or the channel you followed: goup install 1.26
-gotm remove go          # each toolchain gotm list shows
-rm -rf ~/.gotm          # once gotm list is empty
-```
-
-and swap `~/.gotm/bin` for `~/.goup/bin` on your `PATH`.
-
 ## Verifying releases
 
 Every release archive contains `LICENSE`. Verify the signed checksum manifest

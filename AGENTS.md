@@ -2,10 +2,9 @@
 
 goup keeps one go, on the channel it was installed with, the way rustup keeps
 rust's default toolchain: go itself picks a project's toolchain (GOTOOLCHAIN),
-so goup is only the go you run everywhere else. It was gotm, a stripped down
-ghpm for the one package go, and it still is underneath: the pinning, the
-manifest, the disk layout, the output and the conventions are ghpm's on
-purpose, and most of the code behind them is shared with it (see **golie**),
+so goup is only the go you run everywhere else. Underneath it is a stripped
+down ghpm for the one package go: the pinning, the manifest, the disk layout,
+the output and the conventions are ghpm's on purpose, and most of the code behind them is shared with it (see **golie**),
 so read ghpm's AGENTS.md for the reasoning behind anything here that looks
 unexplained. The verbs are rustup's and dotnetup's, with ghpm's as aliases.
 
@@ -137,7 +136,7 @@ Both are ghpm's, through golie. `~/.goup/manifest.json`:
 ```
 
 There is one entry. Its key is the channel, `go` or `go@<pin>`, which is
-where the pin itself is kept; a manifest gotm left with more than one is read
+where the pin itself is kept; a manifest with more than one entry is read
 as is, and the next install of another channel drops the rest. `pin` is the
 level the pin holds it to (`latest`,
 `major`, `minor`, `fixed`); `version` is the release it is on, without
