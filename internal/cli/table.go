@@ -95,8 +95,12 @@ func printTable(headers []string, rows [][]string, colColors []func(string) stri
 	ui.Table(headers, rows, colColors)
 }
 
+// promptConfirm asks msg, or with --yes takes it as answered. Either way the
+// work starts a new step after a blank: the confirm line's, or, with no
+// confirm line, its own.
 func promptConfirm(msg string) bool {
 	if yes {
+		sep()
 		return true
 	}
 	return ui.Confirm(msg)
@@ -139,7 +143,6 @@ func printFailedTable(noun string, items []failedItem) {
 		rows[i] = []string{it.name, it.reason}
 	}
 	printTable([]string{"name", "reason"}, rows, nil)
-	sep()
 }
 
 // closing ends a command that reported its failures as it met them.

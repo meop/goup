@@ -312,3 +312,22 @@ func TestTidyNothing(t *testing.T) {
 		t.Errorf("tidy printed %q", got)
 	}
 }
+
+// --yes skips the confirm line, not the step: the work after a gate starts
+// after a blank, as it does under a confirm, and its lines run tight
+func TestGateYesStartsTheWorkAfterABlank(t *testing.T) {
+	out := capture(t)
+	yes = true
+	t.Cleanup(func() { yes = false })
+
+	if !gate([]string{"name"}, [][]string{{"go"}}, nil, "proceed?") {
+		t.Fatal("gate declined under --yes")
+	}
+	print("go: asset fetching [go.tar.gz]...")
+	print("go: bin found [bin/go]")
+
+	want := "name\n----\ngo\n\ngo: asset fetching [go.tar.gz]...\ngo: bin found [bin/go]\n"
+	if got := out(); got != want {
+		t.Errorf("got %q, want %q", got, want)
+	}
+}

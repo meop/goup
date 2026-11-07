@@ -248,6 +248,22 @@ used: its archive against its `SHA256SUMS`, and that against its signature by
 the meop release key golie carries. Never have `apply` look for a newer
 release, and never make wedge part of `upgrade`.
 
+## Line spacing
+
+A blank line means the run has moved to the next step of its flow. Nothing else gets one.
+
+- Exactly one blank line before every prompt: never none, never two.
+- A prompt, the answer typed to it, and the output that answer lets through are one step: the output starts on the line
+  right below the answer.
+- Lines of one kind in a row (downloads, bins found, refresh lines, a script's output) run tight: no blank between them,
+  none after them.
+- A step never ends itself with a blank line; the step after it asks for one.
+- `-y` answers a prompt without showing it; the prompt's blank line still comes, where the prompt would have been.
+
+The rule is the same, word for word, in golie, ghpm, goup, shire, wut and wut-config.
+
+Here: everything prints through golie's `ui`, and `sep()` is its `Break`. The steps are ghpm's: what was asked for, the gate, the work and the `✓` line that closes it, and what failed. `promptConfirm` asks for the confirm's blank under `--yes`.
+
 ## Testing on a real host
 
 CI runs the tests on Linux and Windows on x86_64 and arm64, and macOS on arm64. To run them on a machine of your own over ssh:
