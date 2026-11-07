@@ -39,16 +39,12 @@ func runRefresh(cmd *cobra.Command, args []string) error {
 		return fail("wedge: %v", err)
 	}
 	from, to, err := r.Refresh(context.Background(), dir, vendored.Options{Fetching: fetchingWedge})
-	switch {
-	case err != nil:
-		return fail("wedge: %v", err)
-	case from == to:
-		printPass("wedge %s is the latest", to)
-	case from == "":
-		printPass("installed wedge %s", to)
-	default:
-		printPass("updated wedge %s → %s", from, to)
-		print("shims keep the wedge they were stamped with: `goup update --reinstall` restamps them")
+	if err != nil {
+		return fail("%s: %v", vendored.Label("wedge"), err)
+	}
+	printPass("%s", vendored.Said(vendored.Label("wedge"), from, to))
+	if from != "" && from != to {
+		print("%s: shims keep the wedge that stamped them until [goup update --reinstall]", vendored.Label("wedge"))
 	}
 	return nil
 }
@@ -76,4 +72,6 @@ func wedgeRelease(l layout.Layout) (string, vendored.Release, error) {
 
 // fetchingWedge says wedge's archive is being fetched, as any other download
 // is said
-func fetchingWedge(archive string) { print("wedge: asset fetching [%s]...", archive) }
+func fetchingWedge(archive string) {
+	print("%s: asset fetching [%s]...", vendored.Label("wedge"), archive)
+}

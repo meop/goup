@@ -48,6 +48,7 @@ goup tidy            # remove unused cached archives and orphaned items
 goup tidy --all      # remove all cached archives
 
 goup refresh         # move the wedge goup stamps its shims with to its latest
+goup doctor          # check goup's lock, wedge, go, PATH and cache
 goup upgrade         # upgrade goup itself
 ```
 

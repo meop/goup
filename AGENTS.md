@@ -121,8 +121,12 @@ adding a flag or a message, find ghpm's and use its shape and its words, with
   platform and a fixed `bin`, so there is no asset prompt, no bin prompt, no
   second gate, and nothing recorded as declined
 - **No GitHub for go.** go's releases and checksums are go.dev's, so there is
-  no `gh`, no `info`, `download` or `doctor`, and no `--skip-hash-check`.
+  no `gh`, no `info` or `download`, and no `--skip-hash-check`.
   `refresh` is ghpm's verb, for the one thing goup takes from GitHub: wedge
+- **`doctor` is ghpm's, for goup's own state**: its lock, its vendored wedge,
+  the go each version pointer names, `~/.goup/bin` on PATH, and the cache. It
+  prints through golie's `doctor`, so its lines are ghpm's: a vendored tool is
+  `vendor - wedge`, with the version it holds, as refresh names it
 
 ## Manifest and disk layout
 
@@ -235,9 +239,11 @@ pinned. Before anything is stamped, `apply` makes sure there is one, and uses
 whatever is there with no network: only where there is none (a new machine) is
 the latest fetched, said in the same `asset fetching` line as any download.
 **`refresh` is the one command that moves it**, for the user to run when they
-mean "get what's new"; it says that wedge is the latest, or what it installed
-or updated, and that shims keep the wedge they were stamped with until
-`update --reinstall` restamps them. A release is checked before any of it is
+mean "get what's new"; it says on one line, labelled `vendor - wedge` and in
+golie's `vendored.Said` words as every tool that vendors one does, that wedge
+is at the latest, or what it installed or updated, and on the next that shims
+keep the wedge that stamped them until `update --reinstall`. A download of it
+is said under the same label. A release is checked before any of it is
 used: its archive against its `SHA256SUMS`, and that against its signature by
 the meop release key golie carries. Never have `apply` look for a newer
 release, and never make wedge part of `upgrade`.

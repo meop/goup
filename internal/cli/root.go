@@ -99,6 +99,7 @@ Use "{{.CommandPath}} [command] --help" for more information about a command.{{e
 	root.AddCommand(
 		newCheckCmd(),
 		newDefaultCmd(),
+		newDoctorCmd(),
 		newFindCmd(),
 		newInstallCmd(),
 		newListCmd(),
