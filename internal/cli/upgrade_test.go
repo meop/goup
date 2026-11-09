@@ -94,7 +94,7 @@ func TestUpgradeRefusesAGoupItsInstallerDidNotPlace(t *testing.T) {
 			if err := runUpgrade(newUpgradeCmd(), nil); err != errSilent {
 				t.Fatalf("runUpgrade = %v, want the refusal", err)
 			}
-			if got, want := strings.TrimSpace(output()), "✗ goup: cannot upgrade itself, running from "+elsewhere; got != want {
+			if got, want := strings.TrimSpace(output()), "✗ goup: cannot upgrade itself, running from "+elsewhere+": upgrade it with what installed it"; got != want {
 				t.Errorf("expected the single refusal line %q, got:\n%s", want, got)
 			}
 			if got, _ := os.ReadFile(elsewhere); string(got) != "goup" {

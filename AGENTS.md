@@ -229,7 +229,7 @@ Windows, which will not overwrite a running executable). Only the goup in
 or through a symlink. One that runs from anywhere else — ghpm's, `go
 install`'s, a build — was put there by something else, which is what upgrades
 it: it is refused in one line (`✗ goup: cannot upgrade itself, running from
-<path>`, off `golie/upgrade`'s `Check`) before the release page is asked
+<path>: upgrade it with what installed it`, off `golie/upgrade`'s `Check`) before the release page is asked
 anything. Everything else such a goup does is unchanged: its
 state is still `~/.goup` and its shims still go in `~/.goup/bin`, it is only
 not in there itself.
