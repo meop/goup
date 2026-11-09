@@ -4,7 +4,7 @@ go 1.27.0
 
 require (
 	github.com/fatih/color v1.19.0
-	github.com/meop/golie v0.11.2
+	github.com/meop/golie v0.11.4
 	github.com/spf13/cobra v1.10.2
 )
 
