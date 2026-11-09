@@ -73,7 +73,7 @@ new one is in place. The commands keep their names, `go` and `gofmt`, whatever t
 
 | Flag | Commands | Description |
 |---|---|---|
-| `--reinstall`, `-r` | `install`, `default`, `update` | Reinstall even if already installed / already at latest version |
+| `--reinstall`, `-r` | `install`, `default`, `update` | Reinstall even if already installed / up to date |
 | `--force`, `-f` | `install`, `default`, `update` | Replace a file in `~/.goup/bin` that goup did not put there |
 | `--all` | `tidy` | Remove all cached archives regardless of installation status |
 | `--long-names`, `-l` | `list`, `find`, `check` | Print names only, one per line, and nothing when there are none |

@@ -100,7 +100,7 @@ func newUpdateCmd() *cobra.Command {
 		Args:  cobra.NoArgs,
 		RunE:  runUpdate,
 	}
-	addInstallFlags(cmd, "Reinstall even if already at latest version")
+	addInstallFlags(cmd, "Reinstall even if up to date")
 	return cmd
 }
 

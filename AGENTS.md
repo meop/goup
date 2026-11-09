@@ -241,7 +241,7 @@ the latest fetched, said in the same `asset fetching` line as any download.
 **`refresh` is the one command that moves it**, for the user to run when they
 mean "get what's new"; it says on one line, labelled `vendor - wedge` and in
 golie's `vendored.Said` words as every tool that vendors one does, that wedge
-is at the latest, or what it installed or updated, and on the next that shims
+is up to date, or what it installed or updated, and on the next that shims
 keep the wedge that stamped them until `update --reinstall`. A download of it
 is said under the same label. A release is checked before any of it is
 used: its archive against its `SHA256SUMS`, and that against its signature by

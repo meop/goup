@@ -78,7 +78,7 @@ func TestRefreshSaysWhatItDid(t *testing.T) {
 
 	for _, step := range []struct{ latest, want string }{
 		{"1.0.0", "vendor - wedge: asset fetching [" + mustArchive(t, "1.0.0") + "]...\n✓ vendor - wedge: installed [1.0.0]\n"},
-		{"1.0.0", "✓ vendor - wedge: at the latest [1.0.0]\n"},
+		{"1.0.0", "✓ vendor - wedge: up to date [1.0.0]\n"},
 		{"2.0.0", "vendor - wedge: asset fetching [" + mustArchive(t, "2.0.0") + "]...\n✓ vendor - wedge: updated [1.0.0 → 2.0.0]\nvendor - wedge: shims keep the wedge that stamped them until [goup update --reinstall]\n"},
 	} {
 		latest = step.latest
