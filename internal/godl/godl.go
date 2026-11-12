@@ -14,8 +14,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/meop/golie/vers"
-
 	"github.com/meop/goup/internal/config"
 )
 
@@ -87,14 +85,31 @@ func Resolve(releases []Release, pin string) (Release, error) {
 			return r, nil
 		}
 	}
-	c, err := vers.ParseConstraint(pin)
+	line, err := parseLine(pin)
 	if err != nil {
 		return Release{}, err
 	}
-	if c.Level == vers.PinExact {
-		return Release{}, fmt.Errorf("go has no release %s", pin)
+	return newest(releases, func(r Release) bool {
+		nums, pre := order(r.Version)
+		return r.Stable && pre == "" && slices.Equal(nums[:len(line)], line)
+	})
+}
+
+// parseLine reads a major ("1") or minor ("1.26") pin; a full version that go.dev doesn't list names no release.
+func parseLine(pin string) ([]int, error) {
+	parts := strings.Split(strings.TrimPrefix(strings.TrimPrefix(pin, "go"), "v"), ".")
+	if len(parts) > 2 {
+		return nil, fmt.Errorf("go has no release %s", pin)
 	}
-	return newest(releases, func(r Release) bool { return r.Stable && c.Matches(r.Version) })
+	line := make([]int, len(parts))
+	for i, p := range parts {
+		n, err := strconv.Atoi(p)
+		if err != nil {
+			return nil, fmt.Errorf("invalid version %q: expected latest, a line like 1.26, or a release go.dev lists", pin)
+		}
+		line[i] = n
+	}
+	return line, nil
 }
 
 func newest(releases []Release, keep func(Release) bool) (Release, error) {
@@ -112,8 +127,7 @@ func newest(releases []Release, keep func(Release) bool) (Release, error) {
 }
 
 // order is what a release sorts by: its numbers, and whatever follows them
-// ("rc1"), which is nothing for a stable release. vers compares numbers only,
-// and reads "1.28rc1" as far as its 1.
+// ("rc1"), which is nothing for a stable release.
 func order(version string) (nums [3]int, pre string) {
 	rest := Display(version)
 	for i := range nums {
@@ -131,16 +145,16 @@ func order(version string) (nums [3]int, pre string) {
 	return nums, rest
 }
 
-// byNewest sorts releases newest first, a release above its own candidates
-// and betas, and a later candidate above an earlier one.
-func byNewest(a, b Release) int {
-	an, ap := order(a.Version)
-	bn, bp := order(b.Version)
-	if c := slices.Compare(bn[:], an[:]); c != 0 || ap == bp {
+// Compare orders two releases, spelled with or without go.dev's "go": above 0 when a is newer, below when b is. A
+// release is newer than its own candidates and betas, and a later candidate newer than an earlier one.
+func Compare(a, b string) int {
+	an, ap := order(a)
+	bn, bp := order(b)
+	if c := slices.Compare(an[:], bn[:]); c != 0 || ap == bp {
 		return c
 	}
 	if ap == "" || bp == "" {
-		return len(ap) - len(bp)
+		return len(bp) - len(ap)
 	}
 	word := func(pre string) (string, int) {
 		letters := strings.TrimRight(pre, "0123456789")
@@ -149,11 +163,14 @@ func byNewest(a, b Release) int {
 	}
 	aw, ai := word(ap)
 	bw, bi := word(bp)
-	if c := strings.Compare(bw, aw); c != 0 {
+	if c := strings.Compare(aw, bw); c != 0 {
 		return c
 	}
-	return bi - ai
+	return ai - bi
 }
+
+// byNewest sorts releases newest first.
+func byNewest(a, b Release) int { return Compare(b.Version, a.Version) }
 
 // Line is the line a release is of: its first two numbers, "1.26" for
 // go1.26.4 and for go1.26rc1.

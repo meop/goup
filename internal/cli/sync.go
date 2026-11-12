@@ -15,7 +15,6 @@ import (
 	"github.com/meop/golie/layout"
 	"github.com/meop/golie/manifest"
 	"github.com/meop/golie/tidy"
-	"github.com/meop/golie/vers"
 
 	"github.com/meop/goup/internal/config"
 	"github.com/meop/goup/internal/godl"
@@ -204,7 +203,7 @@ func runUpdate(cmd *cobra.Command, args []string) error {
 			failed = append(failed, failedItem{name: key, reason: err.Error()})
 			continue
 		}
-		if vers.CompareVersions(target.Version, prev.Version) > 0 || reinstall {
+		if godl.Compare(target.Version, prev.Version) > 0 || reinstall {
 			changes = append(changes, change{key: key, pin: pin, prev: prev, target: target})
 		}
 	}

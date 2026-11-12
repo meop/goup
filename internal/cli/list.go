@@ -6,7 +6,6 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/meop/golie/manifest"
-	"github.com/meop/golie/vers"
 
 	"github.com/meop/goup/internal/config"
 	"github.com/meop/goup/internal/godl"
@@ -76,7 +75,7 @@ func newCheckCmd() *cobra.Command {
 					hadErrors = true
 					continue
 				}
-				if vers.CompareVersions(target.Version, e.Version) > 0 {
+				if godl.Compare(target.Version, e.Version) > 0 {
 					rows = entryRows(rows, []string{key, e.Version, godl.Display(target.Version), e.Pin, m.Repos[pkgGo]}, e)
 					keys = append(keys, key)
 				}

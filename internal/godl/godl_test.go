@@ -56,6 +56,31 @@ func TestResolve(t *testing.T) {
 	}
 }
 
+func TestCompare(t *testing.T) {
+	for _, tc := range []struct {
+		a, b string
+		want int
+	}{
+		{"go1.27.10", "go1.27.9", 1},
+		{"1.27.10", "go1.27.9", 1},
+		{"go1.27.2", "go1.27.2", 0},
+		{"go1.27", "go1.27rc2", 1},
+		{"go1.27rc2", "go1.27rc1", 1},
+		{"go1.27rc10", "go1.27rc9", 1},
+		{"go1.27rc1", "go1.27beta2", 1},
+		{"go1.28rc1", "go1.27.10", 1},
+		{"go1.20", "go1.19.13", 1},
+	} {
+		got := Compare(tc.a, tc.b)
+		if (got > 0) != (tc.want > 0) || (got < 0) != (tc.want < 0) {
+			t.Errorf("Compare(%q, %q) = %d, want the sign of %d", tc.a, tc.b, got, tc.want)
+		}
+		if back := Compare(tc.b, tc.a); (back > 0) != (tc.want < 0) || (back < 0) != (tc.want > 0) {
+			t.Errorf("Compare(%q, %q) = %d, want the sign of %d", tc.b, tc.a, back, -tc.want)
+		}
+	}
+}
+
 func versions(releases []Release) []string {
 	out := make([]string, len(releases))
 	for i, r := range releases {

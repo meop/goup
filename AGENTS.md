@@ -83,10 +83,13 @@ Everything goup shares with ghpm lives in [golie](https://github.com/meop/golie)
 a separate module, and that is most of it: `manifest` (the manifest's format,
 keys, pin levels and shim names), `layout` (the directories under `~/.goup`),
 `journal` (commit and rollback), `tidy` (what is broken or orphaned, and its
-removal), `ui` (output and prompts), `vers` (pins and comparison), `fetch`
+removal), `ui` (output and prompts), `fetch`
 (the checked download and extraction), `vendored`, `wedge` and `sig` (the
 vendored mallet, at wedge's latest release, checked against its signature),
-`shim`, `upgrade`, `lock` and `home`.
+`shim`, `upgrade`, `lock` and `home`. Versions are goup's own (`godl`): go.dev
+marks each release stable or not, `latest` and a line pin (`1`, `1.26`) take
+the newest stable, a name go.dev lists is taken as given, and `Compare` orders
+go's names (a release above its own `rc` and `beta`, `rc10` above `rc9`).
 golie knows nothing of go: where ghpm passes a package name, goup passes
 `go`. A change to any of those is made there, released there (bump its
 `VERSION`), and taken here with `go get github.com/meop/golie@v<VERSION>`.
