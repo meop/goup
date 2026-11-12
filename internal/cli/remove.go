@@ -13,10 +13,10 @@ import (
 	"github.com/meop/goup/internal/store"
 )
 
-func newUninstallCmd() *cobra.Command {
+func newRemoveCmd() *cobra.Command {
 	return &cobra.Command{
-		Use:   "uninstall",
-		Short: "Uninstall go",
+		Use:   "remove",
+		Short: "Remove go",
 		Args:  cobra.NoArgs,
 		RunE:  runUninstall,
 	}

@@ -43,9 +43,9 @@ func newListCmd() *cobra.Command {
 	return cmd
 }
 
-func newCheckCmd() *cobra.Command {
+func newOutdatedCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "check",
+		Use:   "outdated",
 		Short: "Say whether a newer release is out for go's channel",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {

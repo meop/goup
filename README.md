@@ -30,30 +30,28 @@ it installs.
 ## Usage
 
 ```sh
-goup install         # follow go's newest stable release, as go and gofmt
-goup install latest  # the same, said aloud
-goup install 1.26    # follow the newest 1.26.x instead
-goup install 1.26.4  # stay on exactly 1.26.4
-goup default         # the channel go follows, and the release it is on
-goup default 1.27    # the same as install 1.27
+goup add             # follow go's newest stable release, as go and gofmt
+goup add latest      # the same, said aloud
+goup add 1.26        # follow the newest 1.26.x instead
+goup add 1.26.4      # stay on exactly 1.26.4
 
-goup update          # move go to the newest release its channel allows
-goup check           # say whether one is out
+goup sync            # move go to the newest release its channel allows
+goup outdated        # say whether one is out
 goup list            # what is installed, and its commands
 goup find            # the newest release of each line go has for this machine
 goup find 1.26       # every 1.26 release, candidates and betas among them
 
-goup uninstall       # remove go
+goup remove          # remove go
 goup tidy            # remove unused cached archives and orphaned items
 goup tidy --all      # remove all cached archives
 
-goup refresh         # move the wedge goup stamps its shims with to its latest
+goup pull            # move the wedge goup stamps its shims with to its latest
 goup doctor          # check goup's lock, wedge, go, PATH and cache
 goup upgrade         # upgrade goup itself
 ```
 
 goup stamps the `go` and `gofmt` shims with [wedge](https://github.com/meop/wedge), kept under `~/.goup/vendor/`.
-Only `goup refresh` looks for a newer wedge; every other command uses the one there, and fetches it only where there
+Only `goup pull` looks for a newer wedge; every other command uses the one there, and fetches it only where there
 is none. A wedge release, and a goup release for `goup upgrade`, is checked against its checksums and their signature
 before it is used.
 
@@ -73,31 +71,31 @@ new one is in place. The commands keep their names, `go` and `gofmt`, whatever t
 
 | Flag | Commands | Description |
 |---|---|---|
-| `--reinstall`, `-r` | `install`, `default`, `update` | Reinstall even if already installed / up to date |
-| `--force`, `-f` | `install`, `default`, `update` | Replace a file in `~/.goup/bin` that goup did not put there |
+| `--reinstall`, `-r` | `add`, `sync` | Reinstall even if already installed / up to date |
+| `--force`, `-f` | `add`, `sync` | Replace a file in `~/.goup/bin` that goup did not put there |
 | `--all` | `tidy` | Remove all cached archives regardless of installation status |
-| `--long-names`, `-l` | `list`, `find`, `check` | Print names only, one per line, and nothing when there are none |
-| `--short-names`, `-s` | `list`, `find`, `check` | Print names only, space-separated on one line, and nothing when there are none |
+| `--long-names`, `-l` | `list`, `find`, `outdated` | Print names only, one per line, and nothing when there are none |
+| `--short-names`, `-s` | `list`, `find`, `outdated` | Print names only, space-separated on one line, and nothing when there are none |
 
 ### Channels
 
 The one go follows one channel, the one it was installed with:
 
-| Syntax | Channel | Follows | `goup update` |
+| Syntax | Channel | Follows | `goup sync` |
 |---|---|---|---|
-| `goup install` | `go` | go's newest stable release | moves to each new release |
-| `goup install 1` | `go@1` | the newest 1.x | moves within 1.x |
-| `goup install 1.26` | `go@1.26` | the newest 1.26.x | moves within 1.26.x |
-| `goup install 1.26.4` | `go@1.26.4` | exactly 1.26.4 | never moves |
+| `goup add` | `go` | go's newest stable release | moves to each new release |
+| `goup add 1` | `go@1` | the newest 1.x | moves within 1.x |
+| `goup add 1.26` | `go@1.26` | the newest 1.26.x | moves within 1.26.x |
+| `goup add 1.26.4` | `go@1.26.4` | exactly 1.26.4 | never moves |
 
-Installing another channel replaces this one; goup never keeps two. `list` and `default`
+Adding another channel replaces this one; goup never keeps two. `list`
 print the channel's name.
 
 ## Behavior
 
-- Nothing is installed until you install it, and `update` only moves what was installed.
+- Nothing is installed until you install it, and `sync` only moves what was installed.
 - `find` lists only releases with an archive for this machine, which are the
-  ones `install` can put here.
+  ones `add` can put here.
 - Updating unpacks the new release beside the old, points the commands at it, and only
   then removes the old one. If any step fails, go is put back as it was.
 - Every archive is checked against the sha256 go.dev states before it is
@@ -106,7 +104,7 @@ print the channel's name.
 - The commands in `~/.goup/bin` are small [wedge](https://github.com/meop/wedge)
   shims that run the real ones where they are unpacked, so there are no
   symlinks or junctions.
-- A release candidate is installed only when you name it (`goup install 1.28rc1`).
+- A release candidate is installed only when you name it (`goup add 1.28rc1`).
 - `goup upgrade` replaces only the goup the install script put in
   `~/.goup/bin`. One installed another way (a package manager, `go install`) works the
   same and keeps the same `~/.goup`, but is upgraded by what installed it.

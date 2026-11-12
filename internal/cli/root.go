@@ -97,15 +97,14 @@ Use "{{.CommandPath}} [command] --help" for more information about a command.{{e
 	root.SetHelpCommand(&cobra.Command{Hidden: true})
 
 	root.AddCommand(
-		newCheckCmd(),
-		newDefaultCmd(),
+		newOutdatedCmd(),
 		newDoctorCmd(),
 		newFindCmd(),
-		newInstallCmd(),
+		newAddCmd(),
 		newListCmd(),
-		newRefreshCmd(),
-		newUninstallCmd(),
-		newUpdateCmd(),
+		newPullCmd(),
+		newRemoveCmd(),
+		newSyncCmd(),
 		newTidyCmd(),
 		newUpgradeCmd(),
 	)

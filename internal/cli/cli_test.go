@@ -138,7 +138,7 @@ func TestInstallGate(t *testing.T) {
 	output := capture(t)
 	dryRun = true
 	defer func() { dryRun = false }()
-	install := newInstallCmd()
+	install := newAddCmd()
 	run := func(args ...string) string {
 		t.Helper()
 		_ = install.RunE(install, args)
@@ -188,32 +188,13 @@ func TestInstallGate(t *testing.T) {
 	}
 }
 
-// default with a channel is install; without one it says what go follows
-func TestDefault(t *testing.T) {
-	t.Setenv("GOUP_TEST_HOME", t.TempDir())
-	output := capture(t)
-	def := newDefaultCmd()
-	if err := def.RunE(def, nil); err != nil || output() != msgNoneInstalled+"\n" {
-		t.Errorf("default with nothing installed: %v", err)
-	}
-	save(t, map[string]config.Entry{"go@1.26": {Pin: "minor", Version: "1.26.9"}})
-	if err := def.RunE(def, nil); err != nil {
-		t.Fatal(err)
-	}
-	if got := output(); got != "go@1.26 → 1.26.9 (minor)\n" {
-		t.Errorf("default printed %q", got)
-	}
-}
-
-// update moves what can move, and takes no channel: a go held to one release
-// is said to be
 func TestUpdateGate(t *testing.T) {
 	t.Setenv("GOUP_TEST_HOME", t.TempDir())
 	goDev(t, nil, "go1.27.2", "go1.27.1", "go1.26.9", "go1.25.14", "go1.25.3")
 	output := capture(t)
 	dryRun = true
 	defer func() { dryRun = false }()
-	update := newUpdateCmd()
+	update := newSyncCmd()
 	run := func() string {
 		t.Helper()
 		_ = update.RunE(update, nil)

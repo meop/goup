@@ -7,7 +7,7 @@ down ghpm for the one package go: the pinning, the manifest, the disk layout,
 the output and the conventions are ghpm's on purpose, and most of the code
 behind them is shared with it (see **golie**), so read ghpm's AGENTS.md for
 the reasoning behind anything here that looks unexplained. The verbs are
-rustup's and dotnetup's, with no aliases.
+ghpm's, with no aliases.
 
 ## After every code change
 
@@ -23,7 +23,7 @@ golangci-lint run ./...
 Tests that access goup state must set `GOUP_TEST_HOME` to a fresh temporary
 directory (`withHome(t)` in `internal/config`). The store package deliberately
 refuses to resolve the real user home from a Go test binary when it is absent.
-Never weaken or bypass this guard: `install`, `update`, `uninstall` and `tidy` delete toolchains.
+Never weaken or bypass this guard: `add`, `sync`, `remove` and `tidy` delete toolchains.
 
 `GOUP_TEST_HOME` also redirects the real binary, which is how to try a change
 by hand without touching `~/.goup`.
@@ -61,10 +61,10 @@ Never create the tag by hand.
 ## Project structure
 
 - `cmd/goup/` — entry point
-- `internal/cli/` — subcommands. `sync.go` holds `install`, `default`,
-  `update` and the one mutating flow they share (`apply`); `find.go` lists
-  go.dev's releases; `list.go` holds `list` and `check`; `remove.go` holds
-  `uninstall` and `dropAll`, which install uses to drop the channel it
+- `internal/cli/` — subcommands. `sync.go` holds `add` and `sync` and the
+  one mutating flow they share (`apply`); `find.go` lists
+  go.dev's releases; `list.go` holds `list` and `outdated`; `remove.go` holds
+  `remove` and `dropAll`, which `add` uses to drop the channel it
   replaces; `tidy.go` is ghpm's over `~/.goup`; `state.go` holds what an
   argument is, and what the commands
   ask of the disk; `table.go` holds the messages, the gate and the closing
@@ -105,14 +105,15 @@ adding a flag or a message, find ghpm's and use its shape and its words, with
 - **One toolchain.** go picks a project's toolchain itself, so there is no
   use for several side by side. Installing a channel replaces whatever is
   installed, and the shims are always `go` and `gofmt`, never `go@1.26`
-- **rustup's verbs.** `install`, `update`, `uninstall`, `check` and
-  `default`, as rustup and dotnetup name them, and no aliases: not ghpm's
-  verbs, nor short forms of these. `update` and `uninstall` take
-  no argument, since there is one go; `install` takes one channel at most
+- **ghpm's verbs.** `add`, `sync`, `remove`, `outdated`, `list`, `find`,
+  `tidy`, `pull`, `upgrade` and `doctor`, as ghpm names them, since the two
+  share golie and a user moves between them. `sync` and `remove` take no
+  argument, since there is one go; `add` takes one channel at most. There is
+  no `default`: `list` shows the channel, and `add` another replaces it
 - **No package argument.** The package is always `go`, so install takes only
-  the pin: `goup install 1.26` is `ghpm add go@1.26`, and the key is
+  the pin: `goup add 1.26` is `ghpm add go@1.26`, and the key is
   `go@1.26` either way. The key itself is accepted too, since `list` prints it
-- **A bare `install` follows latest.** ghpm's `add` needs a name; goup's has
+- **A bare `add` follows latest.** ghpm's `add` needs a name; goup's has
   the only one there is, so with no argument it installs the toolchain that
   follows the newest release, as a bare `uv python install` does. `latest`
   says the same thing aloud
@@ -125,11 +126,11 @@ adding a flag or a message, find ghpm's and use its shape and its words, with
   second gate, and nothing recorded as declined
 - **No GitHub for go.** go's releases and checksums are go.dev's, so there is
   no `gh`, no `info` or `download`, and no `--skip-hash-check`.
-  `refresh` is ghpm's verb, for the one thing goup takes from GitHub: wedge
+  `pull` is ghpm's verb, for the one thing goup takes from GitHub: wedge
 - **`doctor` is ghpm's, for goup's own state**: its lock, its vendored wedge,
   the go each version pointer names, `~/.goup/bin` on PATH, and the cache. It
   prints through golie's `doctor`, so its lines are ghpm's: a vendored tool is
-  `vendor - wedge`, with the version it holds, as refresh names it
+  `vendor - wedge`, with the version it holds, as pull names it
 
 ## Manifest and disk layout
 
@@ -168,12 +169,12 @@ The flow model is ghpm's: resolve what was asked → a **gate table** + confirm
 → progress lines and a `✓ N` line, with a `✗ N toolchain(s) failed`
 name/reason table whenever anything failed.
 
-**Arguments** — `install` (and `default` given one) takes a pin whole
+**Arguments** — `add` takes a pin whole
 (`parsePin`): `latest`, a line, or one release, spelled bare (`1.26`) or as
 its key (`go@1.26`; `go` is `latest`). `find` takes the start of a version
 (`godl.StartsWith`: `1.2` starts `1.2.1` and `1.2rc1`, never `1.26`), which
-`godl.Found` puts to go.dev's releases. `list`, `check`, `update` and
-`uninstall` take nothing: there is one go.
+`godl.Found` puts to go.dev's releases. `list`, `outdated`, `sync` and
+`remove` take nothing: there is one go.
 
 **Install** — one argument at most (none is `latest`): already installed on
 that channel says so unless `--reinstall` → resolve the pin against go.dev →
@@ -182,7 +183,7 @@ replaces) + confirm → `apply` → `dropAll` on every other key, keeping the
 shims the new one stamped under the same names.
 
 **Default** — no argument: each key with its release and pin level, as
-`go@1.26 → 1.26.9 (minor)`. With one: `install`.
+`go@1.26 → 1.26.9 (minor)`. With one: `add`.
 
 **Update** — moves what was installed and nothing else: with nothing installed
 it says so. A `fixed` install is said and skipped; the rest: resolve → a newer
@@ -202,15 +203,15 @@ names. The old extract dir is deleted only after the commit, because that
 rollback restores from it.
 
 **Find** — go.dev's full release list, kept to the releases with an archive
-for this machine (what `install` can put here). No term: the newest stable
+for this machine (what `add` can put here). No term: the newest stable
 release of each line. A term: every release it starts, newest first,
 candidates and betas included, since naming one is how it is installed. A `name`
 column shows the installs on a release, and is dropped when there are none.
 Names mode prints the versions.
 
 **List / Check** — ghpm's tables: a row per shim
-(name/version/pin/uri/type/target, with `update` for check). `uri` is always `go.dev/dl`; it is kept so the tables are
-the ones ghpm prints. `check` leaves fixed installs out.
+(name/version/pin/uri/type/target, with an `update` column for `outdated`). `uri` is always `go.dev/dl`; it is kept so the tables are
+the ones ghpm prints. `outdated` leaves fixed installs out.
 
 **Uninstall** — gate → `dropAll`: a toolchain's shims, then its extract dir,
 then its manifest entry. Nothing here can be rolled back, so the order is the
@@ -241,7 +242,7 @@ not in there itself.
 pinned. Before anything is stamped, `apply` makes sure there is one, and uses
 whatever is there with no network: only where there is none (a new machine) is
 the latest fetched, said in the same `asset fetching` line as any download.
-**`refresh` is the one command that moves it**, for the user to run when they
+**`pull` is the one command that moves it**, for the user to run when they
 mean "get what's new"; it says on one line, labelled `vendor - wedge` and in
 golie's `vendored.Said` words as every tool that vendors one does, that wedge
 is up to date, or what it installed or updated, and on the next that shims
@@ -258,7 +259,7 @@ A blank line means the run has moved to the next step of its flow. Nothing else 
 - Exactly one blank line before every prompt: never none, never two.
 - A prompt, the answer typed to it, and the output that answer lets through are one step: the output starts on the line
   right below the answer.
-- Lines of one kind in a row (downloads, bins found, refresh lines, a script's output) run tight: no blank between them,
+- Lines of one kind in a row (downloads, bins found, pull lines, a script's output) run tight: no blank between them,
   none after them.
 - A step never ends itself with a blank line; the step after it asks for one.
 - `-y` answers a prompt without showing it; the prompt's blank line still comes, where the prompt would have been.
@@ -288,16 +289,16 @@ CI runs the tests on Linux and Windows on x86_64 and arm64, and macOS on arm64. 
   and touches nothing that is not goup's. `--force` is the only way a shim
   replaces a file in `~/.goup/bin` that `shim.IsShim` does not say goup
   stamped, which is the one destructive thing either command can do. Both
-  mean the same on `install` and on `update`, and the same in ghpm
+  mean the same on `add` and on `sync`, and the same in ghpm
 - A flag is one thing to ask for, means the same on every command that has
   it, and is ghpm's when ghpm has it. Do not copy a flag from uv, rustup or
   anything else because it is there: take what is cleanest, and change both
   tools together
 - Names mode prints names and nothing else: `--long-names` / `--short-names`
-  on `list`, `find` and `check` are output for a script, so every status
+  on `list`, `find` and `outdated` are output for a script, so every status
   line is silent under them and an empty result is empty output — never
   `no toolchains installed`, which a script would have to recognise by its
-  wording. `list` and `check` print keys and `find` prints versions, since
+  wording. `list` and `outdated` print keys and `find` prints versions, since
   those are what every other command takes
 - Output is ghpm's, word for word where the thing said is the same:
   `no toolchains installed`, `all toolchains are up
@@ -308,4 +309,4 @@ CI runs the tests on Linux and Windows on x86_64 and arm64, and macOS on arm64. 
   `✓ installed <name> → <version>`, `✓ updated N toolchain(s)`, `✓ uninstalled go`
 - Table colours are ghpm's roles: `new` on the version an install or update
   goes to, `old` on the one it leaves (and on the channel an install replaces),
-  `info` on the version in `list` and `uninstall`
+  `info` on the version in `list` and `remove`

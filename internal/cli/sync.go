@@ -43,71 +43,42 @@ type change struct {
 	target godl.Release
 }
 
-const installLong = "There is one go, run as go and gofmt, and it follows the channel it was installed with.\n" +
-	"Installing another channel replaces it.\n\n" +
-	"  goup install          follow go's newest stable release\n" +
-	"  goup install latest   the same, said aloud\n" +
-	"  goup install 1.26     follow the newest 1.26.x\n" +
-	"  goup install 1.26.4   stay on exactly 1.26.4\n\n" +
+const addLong = "There is one go, run as go and gofmt, and it follows the channel it was installed with.\n" +
+	"Adding another channel replaces it.\n\n" +
+	"  goup add              follow go's newest stable release\n" +
+	"  goup add latest       the same, said aloud\n" +
+	"  goup add 1.26         follow the newest 1.26.x\n" +
+	"  goup add 1.26.4       stay on exactly 1.26.4\n\n" +
 	"A project's go.mod picks its own toolchain on top of this one: that is go's doing (GOTOOLCHAIN)."
 
-func newInstallCmd() *cobra.Command {
+func newAddCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "install [channel]",
-		Short: "Install go, following latest, a line (1.26) or one release (1.26.4)",
-		Long:  installLong,
+		Use:   "add [channel]",
+		Short: "Add go, following latest, a line (1.26) or one release (1.26.4)",
+		Long:  addLong,
 		Args:  cobra.MaximumNArgs(1),
-		RunE:  runInstall,
+		RunE:  runAdd,
 	}
 	addInstallFlags(cmd, "Reinstall even if already installed")
 	return cmd
 }
 
-func newDefaultCmd() *cobra.Command {
+func newSyncCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "default [channel]",
-		Short: "Show the channel go follows, or install another",
-		Long:  "With no channel, show the one go follows and the release it is on.\n\n" + installLong,
-		Args:  cobra.MaximumNArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if len(args) == 1 {
-				return runInstall(cmd, args)
-			}
-			m, err := config.LoadManifest()
-			if err != nil {
-				return fail("could not load manifest: %v", err)
-			}
-			if len(m.Extracts) == 0 {
-				print(msgNoneInstalled)
-				return nil
-			}
-			for _, key := range m.Keys() {
-				e := m.Extracts[key]
-				print("%s → %s (%s)", key, e.Version, e.Pin)
-			}
-			return nil
-		},
-	}
-	addInstallFlags(cmd, "Reinstall even if already installed")
-	return cmd
-}
-
-func newUpdateCmd() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "update",
-		Short: "Update go to the newest release its channel allows",
+		Use:   "sync",
+		Short: "Sync go to the newest release its channel allows",
 		Args:  cobra.NoArgs,
-		RunE:  runUpdate,
+		RunE:  runSync,
 	}
 	addInstallFlags(cmd, "Reinstall even if up to date")
 	return cmd
 }
 
-// runInstall puts go on the channel asked for, latest when none is. The
+// runAdd puts go on the channel asked for, latest when none is. The
 // channel is the manifest key ghpm would use ("go", "go@1.26"), and only one
 // is kept: once the new one is in, any other is dropped, its shims among
 // them unless the new one stamped the same names.
-func runInstall(cmd *cobra.Command, args []string) error {
+func runAdd(cmd *cobra.Command, args []string) error {
 	ctx := context.Background()
 	unlock, err := config.AcquireLock()
 	if err != nil {
@@ -160,10 +131,10 @@ func runInstall(cmd *cobra.Command, args []string) error {
 	return closing(failed)
 }
 
-// runUpdate moves what was installed and nothing else: with nothing installed
+// runSync moves what was installed and nothing else: with nothing installed
 // it installs none, since which channel to follow is install's choice. A go
 // held to one release has nowhere to move, and is said to be.
-func runUpdate(cmd *cobra.Command, args []string) error {
+func runSync(cmd *cobra.Command, args []string) error {
 	ctx := context.Background()
 	unlock, err := config.AcquireLock()
 	if err != nil {

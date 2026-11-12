@@ -13,18 +13,18 @@ import (
 	"github.com/meop/goup/internal/store"
 )
 
-func newRefreshCmd() *cobra.Command {
+func newPullCmd() *cobra.Command {
 	return &cobra.Command{
-		Use:   "refresh",
-		Short: "Refresh the wedge goup stamps its shims with to its latest",
+		Use:   "pull",
+		Short: "Pull the wedge goup stamps its shims with to its latest",
 		Args:  cobra.NoArgs,
-		RunE:  runRefresh,
+		RunE:  runPull,
 	}
 }
 
-// runRefresh is the one command that moves the vendored wedge: every other
+// runPull is the one command that moves the vendored wedge: every other
 // uses what is there, and fetches one only where there is none.
-func runRefresh(cmd *cobra.Command, args []string) error {
+func runPull(cmd *cobra.Command, args []string) error {
 	unlock, err := config.AcquireLock()
 	if err != nil {
 		return fail("%v", err)
@@ -44,14 +44,14 @@ func runRefresh(cmd *cobra.Command, args []string) error {
 	}
 	printPass("%s", vendored.Said(vendored.Label("wedge"), from, to))
 	if from != "" && from != to {
-		print("%s: shims keep the wedge that stamped them until [goup update --reinstall]", vendored.Label("wedge"))
+		print("%s: shims keep the wedge that stamped them until [goup sync --reinstall]", vendored.Label("wedge"))
 	}
 	return nil
 }
 
 // syncWedge makes sure goup has its vendored mallet and shim templates: what
 // is there is used, with no network, and only where there are none is
-// wedge's latest fetched. `refresh` is what moves it to a newer release.
+// wedge's latest fetched. `pull` is what moves it to a newer release.
 func syncWedge(ctx context.Context, l layout.Layout) error {
 	dir, r, err := wedgeRelease(l)
 	if err != nil {

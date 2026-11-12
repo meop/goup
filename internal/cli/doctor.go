@@ -43,7 +43,7 @@ func runDoctor(cmd *cobra.Command, args []string) error {
 	if dir, r, err := wedgeRelease(l); err != nil {
 		doctor.Fail(vendored.Label("wedge"), err.Error())
 	} else {
-		doctor.Vendored("wedge", r, dir, "goup refresh")
+		doctor.Vendored("wedge", r, dir, "goup pull")
 	}
 
 	m, err := config.LoadManifest()
@@ -51,7 +51,7 @@ func runDoctor(cmd *cobra.Command, args []string) error {
 	case err != nil:
 		doctor.Fail("manifest.json", err.Error())
 	case len(m.Extracts) == 0:
-		doctor.Warn(config.Package, "not installed — `goup install` installs one")
+		doctor.Warn(config.Package, "not installed — `goup add` installs one")
 	default:
 		for _, key := range m.Keys() {
 			e := m.Extracts[key]

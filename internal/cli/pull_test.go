@@ -68,7 +68,7 @@ func wedgeReleases(t *testing.T, latest *string) {
 	t.Cleanup(func() { wedge.ReleasesURL, wedge.Key = origURL, origKey; srv.Close() })
 }
 
-// refresh installs wedge where there is none, says when it is the latest,
+// pull installs wedge where there is none, says when it is the latest,
 // and says what it moved from and to, and that shims keep their wedge
 func TestRefreshSaysWhatItDid(t *testing.T) {
 	t.Setenv("GOUP_TEST_HOME", t.TempDir())
@@ -79,14 +79,14 @@ func TestRefreshSaysWhatItDid(t *testing.T) {
 	for _, step := range []struct{ latest, want string }{
 		{"1.0.0", "vendor - wedge: asset fetching [" + mustArchive(t, "1.0.0") + "]...\n✓ vendor - wedge: installed [1.0.0]\n"},
 		{"1.0.0", "✓ vendor - wedge: up to date [1.0.0]\n"},
-		{"2.0.0", "vendor - wedge: asset fetching [" + mustArchive(t, "2.0.0") + "]...\n✓ vendor - wedge: updated [1.0.0 → 2.0.0]\nvendor - wedge: shims keep the wedge that stamped them until [goup update --reinstall]\n"},
+		{"2.0.0", "vendor - wedge: asset fetching [" + mustArchive(t, "2.0.0") + "]...\n✓ vendor - wedge: updated [1.0.0 → 2.0.0]\nvendor - wedge: shims keep the wedge that stamped them until [goup sync --reinstall]\n"},
 	} {
 		latest = step.latest
-		if err := runRefresh(nil, nil); err != nil {
+		if err := runPull(nil, nil); err != nil {
 			t.Fatal(err)
 		}
 		if got := out(); got != step.want {
-			t.Errorf("refresh to %s printed %q, want %q", step.latest, got, step.want)
+			t.Errorf("pull to %s printed %q, want %q", step.latest, got, step.want)
 		}
 	}
 }

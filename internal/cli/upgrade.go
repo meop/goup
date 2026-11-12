@@ -47,7 +47,7 @@ func newUpgradeCmd() *cobra.Command {
 }
 
 // runUpgrade upgrades goup and nothing else: go itself is update's,
-// and the vendored wedge is refresh's.
+// and the vendored wedge is pull's.
 func runUpgrade(cmd *cobra.Command, args []string) error {
 	ctx := context.Background()
 	failed := func(err error) error {

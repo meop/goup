@@ -27,8 +27,8 @@ func TestDoctorSaysWhatIsMissingAndWhatPutsItThere(t *testing.T) {
 	for _, want := range []string{
 		"goup doctor\n",
 		"  [PASS] lock — no concurrent process detected\n",
-		"  [WARN] vendor - wedge — not present — `goup refresh` installs it\n",
-		"  [WARN] go — not installed — `goup install` installs one\n",
+		"  [WARN] vendor - wedge — not present — `goup pull` installs it\n",
+		"  [WARN] go — not installed — `goup add` installs one\n",
 		"is not on PATH — go won't be found\n",
 		"  [PASS] cache — 0 B — ",
 	} {
