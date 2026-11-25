@@ -19,7 +19,7 @@ import (
 func newDoctorCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:     "doctor",
-		Aliases: []string{"doc"},
+		Aliases: []string{"do", "doc"},
 		Short:   "Check goup's own state: its lock, wedge, go, PATH and cache",
 		Args:    cobra.NoArgs,
 		RunE:    runDoctor,

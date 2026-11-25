@@ -9,15 +9,15 @@ import (
 func TestCommandAliases(t *testing.T) {
 	want := map[string][]string{
 		"add":      {"a", "ad", "in", "install"},
-		"sync":     {"s", "sy", "up", "update"},
-		"remove":   {"r", "rm", "rem", "un", "unin", "uninstall"},
+		"sync":     {"s", "sy", "up", "upd", "update"},
+		"remove":   {"r", "rm", "rem", "un", "uninstall"},
 		"list":     {"l", "li", "ls"},
 		"outdated": {"o", "ou", "out", "stale"},
 		"find":     {"f", "fi", "se", "search"},
 		"tidy":     {"t", "ti", "cl", "clean"},
-		"pull":     {"p", "refresh", "rf"},
-		"doctor":   {"doc"},
-		"upgrade":  {"ug", "upg"},
+		"pull":     {"p", "pu", "refresh", "ref"},
+		"doctor":   {"do", "doc"},
+		"upgrade":  {"upg"},
 	}
 	root := NewRootCmd()
 	for name, aliases := range want {

@@ -16,7 +16,7 @@ import (
 func newRemoveCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:     "remove",
-		Aliases: []string{"r", "rm", "rem", "un", "unin", "uninstall"},
+		Aliases: []string{"r", "rm", "rem", "un", "uninstall"},
 		Short:   "Remove go",
 		Args:    cobra.NoArgs,
 		RunE:    runUninstall,

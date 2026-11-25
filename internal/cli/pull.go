@@ -16,7 +16,7 @@ import (
 func newPullCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:     "pull",
-		Aliases: []string{"p", "refresh", "rf"},
+		Aliases: []string{"p", "pu", "refresh", "ref"},
 		Short:   "Pull the wedge goup stamps its shims with to its latest",
 		Args:    cobra.NoArgs,
 		RunE:    runPull,

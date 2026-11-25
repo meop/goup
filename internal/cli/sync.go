@@ -67,7 +67,7 @@ func newAddCmd() *cobra.Command {
 func newSyncCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "sync",
-		Aliases: []string{"s", "sy", "up", "update"},
+		Aliases: []string{"s", "sy", "up", "upd", "update"},
 		Short:   "Sync go to the newest release its channel allows",
 		Args:    cobra.NoArgs,
 		RunE:    runSync,
