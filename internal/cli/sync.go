@@ -53,11 +53,12 @@ const addLong = "There is one go, run as go and gofmt, and it follows the channe
 
 func newAddCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "add [channel]",
-		Short: "Add go, following latest, a line (1.26) or one release (1.26.4)",
-		Long:  addLong,
-		Args:  cobra.MaximumNArgs(1),
-		RunE:  runAdd,
+		Use:     "add [channel]",
+		Aliases: []string{"a", "ad", "in", "install"},
+		Short:   "Add go, following latest, a line (1.26) or one release (1.26.4)",
+		Long:    addLong,
+		Args:    cobra.MaximumNArgs(1),
+		RunE:    runAdd,
 	}
 	addInstallFlags(cmd, "Reinstall even if already installed")
 	return cmd
@@ -65,10 +66,11 @@ func newAddCmd() *cobra.Command {
 
 func newSyncCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "sync",
-		Short: "Sync go to the newest release its channel allows",
-		Args:  cobra.NoArgs,
-		RunE:  runSync,
+		Use:     "sync",
+		Aliases: []string{"s", "sy", "up", "update"},
+		Short:   "Sync go to the newest release its channel allows",
+		Args:    cobra.NoArgs,
+		RunE:    runSync,
 	}
 	addInstallFlags(cmd, "Reinstall even if up to date")
 	return cmd

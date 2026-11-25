@@ -7,7 +7,7 @@ down ghpm for the one package go: the pinning, the manifest, the disk layout,
 the output and the conventions are ghpm's on purpose, and most of the code
 behind them is shared with it (see **golie**), so read ghpm's AGENTS.md for
 the reasoning behind anything here that looks unexplained. The verbs are
-ghpm's, with no aliases.
+ghpm's, and so are their aliases.
 
 ## After every code change
 
@@ -106,7 +106,8 @@ adding a flag or a message, find ghpm's and use its shape and its words, with
   use for several side by side. Installing a channel replaces whatever is
   installed, and the shims are always `go` and `gofmt`, never `go@1.26`
 - **ghpm's verbs.** `add`, `sync`, `remove`, `outdated`, `list`, `find`,
-  `tidy`, `pull`, `upgrade` and `doctor`, as ghpm names them, since the two
+  `tidy`, `pull`, `upgrade` and `doctor`, as ghpm names them, with ghpm's aliases
+  (`ls`, `rm`, `up`, `in` and the rest), since the two
   share golie and a user moves between them. `sync` and `remove` take no
   argument, since there is one go; `add` takes one channel at most. There is
   no `default`: `list` shows the channel, and `add` another replaces it

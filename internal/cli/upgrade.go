@@ -39,10 +39,11 @@ func installedSelf() (upgrade.Self, error) {
 
 func newUpgradeCmd() *cobra.Command {
 	return &cobra.Command{
-		Use:   "upgrade",
-		Short: "Upgrade goup to its latest release",
-		Args:  cobra.NoArgs,
-		RunE:  runUpgrade,
+		Use:     "upgrade",
+		Aliases: []string{"ug", "upg"},
+		Short:   "Upgrade goup to its latest release",
+		Args:    cobra.NoArgs,
+		RunE:    runUpgrade,
 	}
 }
 

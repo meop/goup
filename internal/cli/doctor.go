@@ -18,10 +18,11 @@ import (
 
 func newDoctorCmd() *cobra.Command {
 	return &cobra.Command{
-		Use:   "doctor",
-		Short: "Check goup's own state: its lock, wedge, go, PATH and cache",
-		Args:  cobra.NoArgs,
-		RunE:  runDoctor,
+		Use:     "doctor",
+		Aliases: []string{"doc"},
+		Short:   "Check goup's own state: its lock, wedge, go, PATH and cache",
+		Args:    cobra.NoArgs,
+		RunE:    runDoctor,
 	}
 }
 

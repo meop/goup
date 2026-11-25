@@ -58,6 +58,21 @@ before it is used.
 There is one go at a time. Installing another channel replaces the one installed, once the
 new one is in place. The commands keep their names, `go` and `gofmt`, whatever the channel.
 
+Each command also answers to short names:
+
+| Command | Aliases |
+|---|---|
+| `add` | `a`, `ad`, `in`, `install` |
+| `sync` | `s`, `sy`, `up`, `update` |
+| `remove` | `r`, `rm`, `rem`, `un`, `unin`, `uninstall` |
+| `list` | `l`, `li`, `ls` |
+| `outdated` | `o`, `ou`, `out`, `stale` |
+| `find` | `f`, `fi`, `se`, `search` |
+| `tidy` | `t`, `ti`, `cl`, `clean` |
+| `pull` | `p`, `refresh`, `rf` |
+| `doctor` | `doc` |
+| `upgrade` | `ug`, `upg` |
+
 ### Global flags
 
 | Flag | Description |

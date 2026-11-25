@@ -13,9 +13,10 @@ import (
 
 func newListCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "list",
-		Short: "List the installed go and its commands",
-		Args:  cobra.NoArgs,
+		Use:     "list",
+		Aliases: []string{"l", "li", "ls"},
+		Short:   "List the installed go and its commands",
+		Args:    cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			m, err := config.LoadManifest()
 			if err != nil {
@@ -45,9 +46,10 @@ func newListCmd() *cobra.Command {
 
 func newOutdatedCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "outdated",
-		Short: "Say whether a newer release is out for go's channel",
-		Args:  cobra.NoArgs,
+		Use:     "outdated",
+		Aliases: []string{"o", "ou", "out", "stale"},
+		Short:   "Say whether a newer release is out for go's channel",
+		Args:    cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			m, err := config.LoadManifest()
 			if err != nil {

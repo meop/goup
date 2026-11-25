@@ -15,10 +15,11 @@ import (
 
 func newPullCmd() *cobra.Command {
 	return &cobra.Command{
-		Use:   "pull",
-		Short: "Pull the wedge goup stamps its shims with to its latest",
-		Args:  cobra.NoArgs,
-		RunE:  runPull,
+		Use:     "pull",
+		Aliases: []string{"p", "refresh", "rf"},
+		Short:   "Pull the wedge goup stamps its shims with to its latest",
+		Args:    cobra.NoArgs,
+		RunE:    runPull,
 	}
 }
 
